@@ -28,7 +28,7 @@ export async function fetchListings(opts: {
     if (f.q) q = q.ilike("title", `%${f.q}%`);
     if (f.listingType) q = q.eq("listing_type", f.listingType);
     if (f.district) q = q.eq("district", f.district);
-    if (f.propertyType) q = q.eq("property_type", f.propertyType);
+    if (f.propertyType) q = q.eq("property_type", f.propertyType as "apartment" | "commercial" | "house" | "room" | "studio" | "villa");
     if (f.minPrice != null) q = q.gte("price", f.minPrice);
     if (f.maxPrice != null) q = q.lte("price", f.maxPrice);
     if (f.bedrooms != null) q = f.bedrooms >= 4 ? q.gte("bedrooms", 4) : q.eq("bedrooms", f.bedrooms);
