@@ -9,38 +9,171 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated.saved'
+import { Route as AuthenticatedPostListingRouteImport } from './routes/_authenticated.post-listing'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated.messages'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListingIdRoute = ListingIdRouteImport.update({
+  id: '/listing/$id',
+  path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPostListingRoute =
+  AuthenticatedPostListingRouteImport.update({
+    id: '/post-listing',
+    path: '/post-listing',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/post-listing': typeof AuthenticatedPostListingRoute
+  '/saved': typeof AuthenticatedSavedRoute
+  '/listing/$id': typeof ListingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/post-listing': typeof AuthenticatedPostListingRoute
+  '/saved': typeof AuthenticatedSavedRoute
+  '/listing/$id': typeof ListingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/search': typeof SearchRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/post-listing': typeof AuthenticatedPostListingRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/listing/$id': typeof ListingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/search'
+    | '/admin'
+    | '/dashboard'
+    | '/messages'
+    | '/post-listing'
+    | '/saved'
+    | '/listing/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/search'
+    | '/admin'
+    | '/dashboard'
+    | '/messages'
+    | '/post-listing'
+    | '/saved'
+    | '/listing/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/search'
+    | '/_authenticated/admin'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/messages'
+    | '/_authenticated/post-listing'
+    | '/_authenticated/saved'
+    | '/listing/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  SearchRoute: typeof SearchRoute
+  ListingIdRoute: typeof ListingIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +181,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/listing/$id': {
+      id: '/listing/$id'
+      path: '/listing/$id'
+      fullPath: '/listing/$id'
+      preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/post-listing': {
+      id: '/_authenticated/post-listing'
+      path: '/post-listing'
+      fullPath: '/post-listing'
+      preLoaderRoute: typeof AuthenticatedPostListingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedPostListingRoute: typeof AuthenticatedPostListingRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedPostListingRoute: AuthenticatedPostListingRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
+  SearchRoute: SearchRoute,
+  ListingIdRoute: ListingIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
