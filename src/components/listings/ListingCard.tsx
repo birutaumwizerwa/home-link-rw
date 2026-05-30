@@ -146,6 +146,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           </div>
         )}
 
+        {(listing.views_count != null || listing.created_at) && (
+          <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>{listing.views_count ? `${listing.views_count} views` : ""}</span>
+            <span>{listing.created_at ? new Date(listing.created_at).toLocaleDateString("en-RW", { day: "numeric", month: "short" }) : ""}</span>
+          </div>
+        )}
+
         <div className="mt-4 flex items-center justify-between border-t pt-3">
           <div className="flex items-center gap-2">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary text-xs font-semibold">
