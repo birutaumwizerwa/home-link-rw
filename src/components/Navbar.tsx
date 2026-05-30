@@ -76,6 +76,11 @@ export function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
                   <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
+                  {unread > 0 && (
+                    <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
                 </DropdownMenuItem>
                 {isVendor && (
                   <>
