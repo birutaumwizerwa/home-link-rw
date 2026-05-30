@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VendorIdRouteImport } from './routes/vendor.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated.saved'
 import { Route as AuthenticatedPostListingRouteImport } from './routes/_authenticated.post-listing'
@@ -30,6 +32,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -37,6 +44,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendorIdRoute = VendorIdRouteImport.update({
+  id: '/vendor/$id',
+  path: '/vendor/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
@@ -73,6 +85,7 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/search': typeof SearchRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -81,9 +94,11 @@ export interface FileRoutesByFullPath {
   '/post-listing': typeof AuthenticatedPostListingRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/listing/$id': typeof ListingIdRoute
+  '/vendor/$id': typeof VendorIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/search': typeof SearchRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -92,11 +107,13 @@ export interface FileRoutesByTo {
   '/post-listing': typeof AuthenticatedPostListingRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/listing/$id': typeof ListingIdRoute
+  '/vendor/$id': typeof VendorIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/search': typeof SearchRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -105,11 +122,13 @@ export interface FileRoutesById {
   '/_authenticated/post-listing': typeof AuthenticatedPostListingRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/listing/$id': typeof ListingIdRoute
+  '/vendor/$id': typeof VendorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/search'
     | '/admin'
@@ -118,9 +137,11 @@ export interface FileRouteTypes {
     | '/post-listing'
     | '/saved'
     | '/listing/$id'
+    | '/vendor/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/search'
     | '/admin'
@@ -129,10 +150,12 @@ export interface FileRouteTypes {
     | '/post-listing'
     | '/saved'
     | '/listing/$id'
+    | '/vendor/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
     | '/search'
     | '/_authenticated/admin'
@@ -141,14 +164,17 @@ export interface FileRouteTypes {
     | '/_authenticated/post-listing'
     | '/_authenticated/saved'
     | '/listing/$id'
+    | '/vendor/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   SearchRoute: typeof SearchRoute
   ListingIdRoute: typeof ListingIdRoute
+  VendorIdRoute: typeof VendorIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -167,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -179,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendor/$id': {
+      id: '/vendor/$id'
+      path: '/vendor/$id'
+      fullPath: '/vendor/$id'
+      preLoaderRoute: typeof VendorIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -249,9 +289,11 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   SearchRoute: SearchRoute,
   ListingIdRoute: ListingIdRoute,
+  VendorIdRoute: VendorIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
