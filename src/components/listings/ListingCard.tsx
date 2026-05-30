@@ -25,6 +25,8 @@ export type ListingCardData = {
   has_furnished: boolean;
   has_security: boolean;
   has_parking: boolean;
+  views_count?: number;
+  created_at?: string;
   vendor_id: string;
   vendor?: {
     business_name: string | null;
