@@ -4,7 +4,7 @@ import type { SearchFilters } from "@/store/app-store";
 
 const SELECT = `
   id, title, listing_type, property_type, price, price_period, bedrooms, bathrooms, size_sqm,
-  district, sector, cover_image_url,
+  district, sector, cover_image_url, views_count, created_at,
   has_kitchen, has_furnished, has_security, has_parking,
   vendor_id,
   vendor:vendors!listings_vendor_id_fkey ( business_name, is_verified, profile:profiles!vendors_id_fkey ( full_name ) )
@@ -13,6 +13,7 @@ const SELECT = `
 export async function fetchListings(opts: {
   featured?: boolean;
   limit?: number;
+  offset?: number;
   filters?: Partial<SearchFilters>;
   vendorId?: string;
   onlyApproved?: boolean;
@@ -36,7 +37,8 @@ export async function fetchListings(opts: {
       for (const a of f.amenities) q = q.eq(a, true);
     }
   }
-  if (opts.limit) q = q.limit(opts.limit);
+  if (opts.offset != null) q = q.range(opts.offset, opts.offset + (opts.limit ?? 20) - 1);
+  else if (opts.limit) q = q.limit(opts.limit);
   const { data, error } = await q;
   if (error) throw error;
   return (data ?? []) as unknown as ListingCardData[];

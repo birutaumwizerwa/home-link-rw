@@ -75,5 +75,6 @@ export const PLANS = {
 
 export const FREE_POST_LIMIT = 3;
 
-export const MOMO_PAYMENT_NUMBER = "0788 000 000"; // placeholder — admin updates
-export const SUPPORT_WHATSAPP = "250788000000"; // placeholder
+export const MOMO_PAYMENT_NUMBER = "0796332122"; // MTN MoMo number
+export const SUPPORT_WHATSAPP = "250796332122"; // international format, no +
+export const CONTACT_EMAIL = "hello@homelink.rw";

@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Trash2, BadgeCheck } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VendorProfileForm } from "@/components/vendor/VendorProfileForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchListings } from "@/lib/listings-query";
@@ -28,6 +30,15 @@ function DashboardPage() {
     queryFn: async () => {
       const { data } = await supabase.from("vendors").select("*").eq("id", user!.id).maybeSingle();
       return data;
+    },
+  });
+
+  const { data: profile, refetch: refetchProfile } = useQuery({
+    queryKey: ["dashboard-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("full_name, phone").eq("id", user!.id).maybeSingle();
+      return data as { full_name: string; phone: string | null } | null;
     },
   });
 
@@ -103,41 +114,72 @@ function DashboardPage() {
           )}
         </div>
 
-        <section className="mt-8">
-          <h2 className="mb-4 text-xl font-semibold">My listings</h2>
-          {!listings || listings.length === 0 ? (
-            <div className="rounded-xl border bg-muted/30 p-10 text-center text-muted-foreground">No listings yet. Click "New listing" to start.</div>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border bg-card">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-                  <tr><th className="p-3">Title</th><th className="p-3">Type</th><th className="p-3">Price</th><th className="p-3">Status</th><th className="p-3"></th></tr>
-                </thead>
-                <tbody>
-                  {(listings as unknown as Array<{ id: string; title: string; listing_type: string; price: number; }>).map((l) => (
-                    <tr key={l.id} className="border-t">
-                      <td className="p-3 font-medium">{l.title}</td>
-                      <td className="p-3 capitalize">{l.listing_type}</td>
-                      <td className="p-3">{formatPrice(l.price)}</td>
-                      <td className="p-3">
-                        <StatusBadge id={l.id} onChange={() => refetch()} />
-                      </td>
-                      <td className="p-3 text-right">
-                        <Button asChild size="sm" variant="ghost"><Link to="/listing/$id" params={{ id: l.id }}>View</Link></Button>
-                        <Button size="sm" variant="ghost" onClick={async () => {
-                          if (!confirm("Delete this listing?")) return;
-                          await supabase.from("listings").delete().eq("id", l.id);
-                          toast.success("Deleted");
-                          qc.invalidateQueries({ queryKey: ["my-listings"] });
-                        }}><Trash2 className="h-4 w-4" /></Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+        <Tabs defaultValue="listings" className="mt-8">
+          <TabsList>
+            <TabsTrigger value="listings">My listings</TabsTrigger>
+            <TabsTrigger value="profile">My profile</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="listings">
+            {!listings || listings.length === 0 ? (
+              <div className="rounded-xl border bg-muted/30 p-10 text-center text-muted-foreground">No listings yet. Click "New listing" to start.</div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border bg-card">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
+                    <tr><th className="p-3">Title</th><th className="p-3">Type</th><th className="p-3">Price</th><th className="p-3">Status</th><th className="p-3"></th></tr>
+                  </thead>
+                  <tbody>
+                    {(listings as unknown as Array<{ id: string; title: string; listing_type: string; price: number; }>).map((l) => (
+                      <tr key={l.id} className="border-t">
+                        <td className="p-3 font-medium">{l.title}</td>
+                        <td className="p-3 capitalize">{l.listing_type}</td>
+                        <td className="p-3">{formatPrice(l.price)}</td>
+                        <td className="p-3">
+                          <StatusBadge id={l.id} onChange={() => refetch()} />
+                        </td>
+                        <td className="p-3 text-right">
+                          <Button asChild size="sm" variant="ghost"><Link to="/listing/$id" params={{ id: l.id }}>View</Link></Button>
+                          <Button size="sm" variant="ghost" onClick={async () => {
+                            if (!confirm("Delete this listing?")) return;
+                            await supabase.from("listings").delete().eq("id", l.id);
+                            toast.success("Deleted");
+                            qc.invalidateQueries({ queryKey: ["my-listings"] });
+                          }}><Trash2 className="h-4 w-4" /></Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-6">
+            {user && (
+              <VendorProfileForm
+                vendor={vendor ?? null}
+                profile={profile ?? null}
+                userId={user.id}
+                onSave={() => refetchProfile()}
+              />
+            )}
+            {!vendor?.is_verified && (
+              <div className="max-w-lg rounded-xl border border-primary/30 bg-primary/5 p-5">
+                <h3 className="flex items-center gap-2 font-semibold"><BadgeCheck className="h-5 w-5 text-primary" /> Get verified</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Verified vendors get more trust, more clicks, and a verified badge on all listings.
+                  Send your National ID to our WhatsApp to get verified for free.
+                </p>
+                <Button asChild variant="outline" className="mt-3">
+                  <a href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`I would like to request verification. My vendor ID: ${user?.id}`)}`} target="_blank" rel="noreferrer">
+                    Request verification via WhatsApp
+                  </a>
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </main>
       <Footer />
     </div>

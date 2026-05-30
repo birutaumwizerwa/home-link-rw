@@ -50,7 +50,7 @@ function PendingListings() {
     queryKey: ["admin", "listings"],
     queryFn: async () => (await supabase.from("listings").select("id,title,price,district,is_approved,vendor_id,created_at").order("created_at", { ascending: false })).data ?? [],
   });
-  const update = async (id: string, patch: Record<string, unknown>) => {
+  const update = async (id: string, patch: { is_approved?: boolean; is_available?: boolean }) => {
     await supabase.from("listings").update(patch).eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "listings"] });
   };

@@ -25,6 +25,8 @@ export type ListingCardData = {
   has_furnished: boolean;
   has_security: boolean;
   has_parking: boolean;
+  views_count?: number;
+  created_at?: string;
   vendor_id: string;
   vendor?: {
     business_name: string | null;
@@ -141,6 +143,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             {amenityChips.map((a) => (
               <span key={a} className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{a}</span>
             ))}
+          </div>
+        )}
+
+        {(listing.views_count != null || listing.created_at) && (
+          <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>{listing.views_count ? `${listing.views_count} views` : ""}</span>
+            <span>{listing.created_at ? new Date(listing.created_at).toLocaleDateString("en-RW", { day: "numeric", month: "short" }) : ""}</span>
           </div>
         )}
 

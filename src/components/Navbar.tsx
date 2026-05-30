@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Home, Search, Plus, Heart, MessageCircle, LogOut, User, Shield, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useUnreadCount } from "@/hooks/use-unread";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -11,6 +12,7 @@ import { initials } from "@/lib/format";
 export function Navbar() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, isVendor, isAdmin, profile, signOut } = useAuth();
+  const unread = useUnreadCount();
   const navigate = useNavigate();
 
   return (
@@ -74,6 +76,11 @@ export function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
                   <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
+                  {unread > 0 && (
+                    <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
                 </DropdownMenuItem>
                 {isVendor && (
                   <>
