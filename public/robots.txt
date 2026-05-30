@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /saved
+
+Sitemap: https://home-link-rw.lovable.app/sitemap.xml
