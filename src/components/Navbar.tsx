@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Home, Search, Plus, Heart, MessageCircle, LogOut, User, Shield, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useUnreadCount } from "@/hooks/use-unread";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -11,6 +12,7 @@ import { initials } from "@/lib/format";
 export function Navbar() {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, isVendor, isAdmin, profile, signOut } = useAuth();
+  const unread = useUnreadCount();
   const navigate = useNavigate();
 
   return (
