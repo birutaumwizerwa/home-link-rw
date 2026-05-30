@@ -83,6 +83,7 @@ function RootComponent() {
       <AuthProvider>
         <CacheInvalidator queryClient={queryClient} />
         <Outlet />
+        <BottomNav />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
