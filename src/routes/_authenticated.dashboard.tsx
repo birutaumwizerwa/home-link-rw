@@ -158,7 +158,7 @@ function DashboardPage() {
           <TabsContent value="profile" className="space-y-6">
             {user && (
               <VendorProfileForm
-                vendor={vendor}
+                vendor={vendor ?? null}
                 profile={profile ?? null}
                 userId={user.id}
                 onSave={() => refetchProfile()}
