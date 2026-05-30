@@ -33,6 +33,15 @@ function DashboardPage() {
     },
   });
 
+  const { data: profile, refetch: refetchProfile } = useQuery({
+    queryKey: ["dashboard-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("full_name, phone").eq("id", user!.id).maybeSingle();
+      return data as { full_name: string; phone: string | null } | null;
+    },
+  });
+
   const { data: listings, refetch } = useQuery({
     queryKey: ["my-listings", user?.id],
     enabled: !!user,
