@@ -1,4 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
 import { Home, Search, Plus, Heart, MessageCircle, LogOut, User, Shield, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,9 +13,18 @@ import { initials } from "@/lib/format";
 
 export function Navbar() {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, isVendor, isAdmin, profile, signOut } = useAuth();
+  const { isAuthenticated, isVendor, isAdmin, profile, user, signOut } = useAuth();
   const unread = useUnreadCount();
   const navigate = useNavigate();
+
+  const { data: navProfile } = useQuery({
+    queryKey: ["nav-avatar", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("avatar_url, full_name").eq("id", user!.id).maybeSingle();
+      return data;
+    },
+  });
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md">
@@ -63,17 +74,25 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-primary font-semibold text-sm">
-                    {initials(profile?.full_name)}
-                  </span>
+                  {navProfile?.avatar_url ? (
+                    <img src={navProfile.avatar_url} alt={navProfile.full_name ?? "Profile"} className="h-8 w-8 rounded-full object-cover" />
+                  ) : (
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-primary font-semibold text-sm">
+                      {initials(navProfile?.full_name ?? profile?.full_name)}
+                    </span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-1.5 text-sm font-semibold">{profile?.full_name}</div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                  <User className="mr-2 h-4 w-4" /> {t("nav.editProfile")}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/saved" })}>
                   <Heart className="mr-2 h-4 w-4" /> {t("nav.saved")}
                 </DropdownMenuItem>
+
                 <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
                   <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
                   {unread > 0 && (

@@ -27,11 +27,12 @@ export type ListingCardData = {
   has_parking: boolean;
   views_count?: number;
   created_at?: string;
+  is_featured?: boolean;
   vendor_id: string;
   vendor?: {
     business_name: string | null;
     is_verified: boolean;
-    profile?: { full_name: string } | null;
+    profile?: { full_name: string; avatar_url?: string | null } | null;
   } | null;
 };
 
@@ -108,7 +109,11 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             {listing.listing_type === "rent" ? "For Rent" : "For Sale"}
           </Badge>
           <Badge variant="secondary" className="capitalize">{listing.property_type}</Badge>
+          {listing.is_featured && (
+            <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400">⭐ Featured</Badge>
+          )}
         </div>
+
 
         <Button
           variant="secondary"
@@ -155,9 +160,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
 
         <div className="mt-4 flex items-center justify-between border-t pt-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary text-xs font-semibold">
-              {initials(vendorName)}
-            </span>
+            {listing.vendor?.profile?.avatar_url ? (
+              <img src={listing.vendor.profile.avatar_url} alt={vendorName} loading="lazy" className="h-7 w-7 rounded-full object-cover" />
+            ) : (
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary text-xs font-semibold">
+                {initials(vendorName)}
+              </span>
+            )}
             <div className="leading-tight">
               <div className="flex items-center gap-1 text-xs font-medium">
                 <span className="line-clamp-1">{vendorName}</span>
