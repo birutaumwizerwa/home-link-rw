@@ -12,7 +12,6 @@ export const Route = createFileRoute("/about")({
       { property: "og:title", content: "How it works — HomeLink Rwanda" },
       { property: "og:description", content: "Rwanda's first trusted real estate platform. Search, contact verified vendors, and find your home." },
     ],
-    links: [{ rel: "canonical", href: "https://home-link-rw.lovable.app/about" }],
   }),
   component: AboutPage,
 });

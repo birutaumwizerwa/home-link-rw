@@ -9,7 +9,7 @@ import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingG
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchListings } from "@/lib/listings-query";
-import heroImg from "@/assets/hero-kigali.jpg";
+const heroImg = "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1400&q=75&auto=format&fit=crop";
 
 export const Route = createFileRoute("/")({
   head: () => ({
