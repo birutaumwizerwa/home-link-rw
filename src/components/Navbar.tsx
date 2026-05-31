@@ -13,9 +13,18 @@ import { initials } from "@/lib/format";
 
 export function Navbar() {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated, isVendor, isAdmin, profile, signOut } = useAuth();
+  const { isAuthenticated, isVendor, isAdmin, profile, user, signOut } = useAuth();
   const unread = useUnreadCount();
   const navigate = useNavigate();
+
+  const { data: navProfile } = useQuery({
+    queryKey: ["nav-avatar", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("avatar_url, full_name").eq("id", user!.id).maybeSingle();
+      return data;
+    },
+  });
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md">
