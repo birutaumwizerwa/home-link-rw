@@ -2,13 +2,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { ListingCardData } from "@/components/listings/ListingCard";
 import type { SearchFilters } from "@/store/app-store";
 
-const SELECT = `
+export const LISTING_CARD_SELECT = `
   id, title, listing_type, property_type, price, price_period, bedrooms, bathrooms, size_sqm,
-  district, sector, cover_image_url, views_count, created_at,
+  district, sector, cover_image_url, views_count, created_at, is_available, is_featured,
   has_kitchen, has_furnished, has_security, has_parking,
   vendor_id,
-  vendor:vendors!listings_vendor_id_fkey ( business_name, is_verified, profile:profiles!vendors_id_fkey ( full_name ) )
+  vendor:vendors!listings_vendor_id_fkey ( business_name, is_verified, profile:profiles!vendors_id_fkey ( full_name, avatar_url ) )
 `;
+const SELECT = LISTING_CARD_SELECT;
 
 export async function fetchListings(opts: {
   featured?: boolean;

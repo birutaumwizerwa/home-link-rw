@@ -27,11 +27,12 @@ export type ListingCardData = {
   has_parking: boolean;
   views_count?: number;
   created_at?: string;
+  is_featured?: boolean;
   vendor_id: string;
   vendor?: {
     business_name: string | null;
     is_verified: boolean;
-    profile?: { full_name: string } | null;
+    profile?: { full_name: string; avatar_url?: string | null } | null;
   } | null;
 };
 
