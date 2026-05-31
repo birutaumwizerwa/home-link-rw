@@ -74,17 +74,25 @@ export function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-primary font-semibold text-sm">
-                    {initials(profile?.full_name)}
-                  </span>
+                  {navProfile?.avatar_url ? (
+                    <img src={navProfile.avatar_url} alt={navProfile.full_name ?? "Profile"} className="h-8 w-8 rounded-full object-cover" />
+                  ) : (
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-primary/15 text-primary font-semibold text-sm">
+                      {initials(navProfile?.full_name ?? profile?.full_name)}
+                    </span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-1.5 text-sm font-semibold">{profile?.full_name}</div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                  <User className="mr-2 h-4 w-4" /> {t("nav.editProfile")}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate({ to: "/saved" })}>
                   <Heart className="mr-2 h-4 w-4" /> {t("nav.saved")}
                 </DropdownMenuItem>
+
                 <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
                   <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
                   {unread > 0 && (
