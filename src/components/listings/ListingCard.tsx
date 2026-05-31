@@ -160,9 +160,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
 
         <div className="mt-4 flex items-center justify-between border-t pt-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary text-xs font-semibold">
-              {initials(vendorName)}
-            </span>
+            {listing.vendor?.profile?.avatar_url ? (
+              <img src={listing.vendor.profile.avatar_url} alt={vendorName} loading="lazy" className="h-7 w-7 rounded-full object-cover" />
+            ) : (
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary text-xs font-semibold">
+                {initials(vendorName)}
+              </span>
+            )}
             <div className="leading-tight">
               <div className="flex items-center gap-1 text-xs font-medium">
                 <span className="line-clamp-1">{vendorName}</span>
