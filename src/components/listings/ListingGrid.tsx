@@ -3,7 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function ListingGrid({ listings, empty }: { listings: ListingCardData[]; empty?: React.ReactNode }) {
   if (listings.length === 0) {
-    return <div className="rounded-xl border bg-muted/30 p-10 text-center text-muted-foreground">{empty ?? "No listings yet."}</div>;
+    if (empty === "") return null;
+    return (
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/30 px-6 py-16 text-center">
+        <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-4xl">🏠</div>
+        <h3 className="text-lg font-semibold">No listings found</h3>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{empty ?? "No listings match your search. Try adjusting your filters."}</p>
+      </div>
+    );
   }
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
