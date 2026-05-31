@@ -109,7 +109,11 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             {listing.listing_type === "rent" ? "For Rent" : "For Sale"}
           </Badge>
           <Badge variant="secondary" className="capitalize">{listing.property_type}</Badge>
+          {listing.is_featured && (
+            <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400">⭐ Featured</Badge>
+          )}
         </div>
+
 
         <Button
           variant="secondary"
