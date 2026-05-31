@@ -9,7 +9,9 @@
     "admin": "Admin",
     "signIn": "Sign in",
     "signUp": "Sign up",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "about": "How it works",
+    "editProfile": "Edit profile"
   },
   "home": {
     "heroTitle": "Find your next home in Rwanda",
@@ -126,5 +128,38 @@
     "yes": "Yes",
     "no": "No",
     "back": "Back"
+  },
+  "profile": {
+    "title": "Edit profile",
+    "personalInfo": "Personal information",
+    "vendorInfo": "Vendor information",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "district": "Your district",
+    "email": "Email address",
+    "emailReadOnly": "Email cannot be changed here. Contact support.",
+    "businessName": "Business / Agency name",
+    "whatsappNumber": "WhatsApp number",
+    "whatsappHint": "Shown to clients on your listings. Keep it active.",
+    "saveBtn": "Save changes",
+    "saving": "Saving...",
+    "saved": "Profile updated successfully",
+    "avatarTitle": "Profile photo",
+    "avatarHint": "JPG, PNG or WebP · Max 3MB",
+    "removePhoto": "Remove photo",
+    "changePhoto": "Change photo",
+    "passwordTitle": "Password",
+    "passwordDesc": "To change your password, we'll send a reset link to your email.",
+    "sendReset": "Send password reset email",
+    "dangerZone": "Danger zone",
+    "deleteDesc": "Deleting your account is permanent. All your data will be lost.",
+    "deleteBtn": "Delete my account"
+  },
+  "vendorStatus": {
+    "verifiedBadge": "Verified vendor",
+    "requestVerification": "Request verification",
+    "verificationTitle": "Get your Verified badge",
+    "verificationDesc": "Verified vendors get 3× more clicks and higher search ranking. Send your National ID to our WhatsApp.",
+    "requestViaWhatsApp": "Request verification via WhatsApp"
   }
 }

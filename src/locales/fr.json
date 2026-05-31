@@ -9,7 +9,9 @@
     "admin": "Admin",
     "signIn": "Se connecter",
     "signUp": "S'inscrire",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "about": "Comment ça marche",
+    "editProfile": "Modifier le profil"
   },
   "home": {
     "heroTitle": "Trouvez votre prochain logement au Rwanda",
@@ -119,5 +121,45 @@
     "verify": "Vérifier",
     "unverify": "Annuler"
   },
-  "common": { "loading": "Chargement...", "save": "Enregistrer", "cancel": "Annuler", "yes": "Oui", "no": "Non", "back": "Retour" }
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "no": "Non",
+    "back": "Retour"
+  },
+  "profile": {
+    "title": "Modifier le profil",
+    "personalInfo": "Informations personnelles",
+    "vendorInfo": "Informations vendeur",
+    "fullName": "Nom complet",
+    "phone": "Numéro de téléphone",
+    "district": "Votre district",
+    "email": "Adresse email",
+    "emailReadOnly": "L'email ne peut pas être modifié ici",
+    "businessName": "Nom de l'agence",
+    "whatsappNumber": "Numéro WhatsApp",
+    "whatsappHint": "Affiché aux clients sur vos annonces",
+    "saveBtn": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "saved": "Profil mis à jour",
+    "avatarTitle": "Photo de profil",
+    "avatarHint": "JPG, PNG ou WebP · Max 3 Mo",
+    "removePhoto": "Supprimer la photo",
+    "changePhoto": "Changer la photo",
+    "passwordTitle": "Mot de passe",
+    "passwordDesc": "Pour changer votre mot de passe, nous enverrons un lien par email.",
+    "sendReset": "Envoyer le lien de réinitialisation",
+    "dangerZone": "Zone de danger",
+    "deleteDesc": "La suppression du compte est définitive.",
+    "deleteBtn": "Supprimer mon compte"
+  },
+  "vendorStatus": {
+    "verifiedBadge": "Vendeur vérifié",
+    "requestVerification": "Demander la vérification",
+    "verificationTitle": "Obtenez le badge vérifié",
+    "verificationDesc": "Les vendeurs vérifiés obtiennent plus de clics.",
+    "requestViaWhatsApp": "Demander la vérification via WhatsApp"
+  }
 }

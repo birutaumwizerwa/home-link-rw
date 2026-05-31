@@ -9,7 +9,9 @@
     "admin": "Admin",
     "signIn": "Injira",
     "signUp": "Iyandikishe",
-    "signOut": "Sohoka"
+    "signOut": "Sohoka",
+    "about": "Uburyo bikora",
+    "editProfile": "Hindura profile"
   },
   "home": {
     "heroTitle": "Shaka inzu yawe mu Rwanda",
@@ -119,5 +121,45 @@
     "verify": "Emeza",
     "unverify": "Ica"
   },
-  "common": { "loading": "Birapakirwa...", "save": "Bika", "cancel": "Hagarika", "yes": "Yego", "no": "Oya", "back": "Subira" }
+  "common": {
+    "loading": "Birapakirwa...",
+    "save": "Bika",
+    "cancel": "Hagarika",
+    "yes": "Yego",
+    "no": "Oya",
+    "back": "Subira"
+  },
+  "profile": {
+    "title": "Hindura profile",
+    "personalInfo": "Amakuru yawe",
+    "vendorInfo": "Amakuru y'umucuruzi",
+    "fullName": "Amazina yombi",
+    "phone": "Nimero ya telefoni",
+    "district": "Akarere kawe",
+    "email": "Imeyili",
+    "emailReadOnly": "Imeyili ntishobora guhindurwa hano",
+    "businessName": "Izina ry'ubucuruzi",
+    "whatsappNumber": "Nimero ya WhatsApp",
+    "whatsappHint": "Igaragazwa ku bakiriya",
+    "saveBtn": "Bika impinduka",
+    "saving": "Birabikwa...",
+    "saved": "Profile yahindutse",
+    "avatarTitle": "Ifoto ya profile",
+    "avatarHint": "JPG, PNG cyangwa WebP · Ntirenze 3MB",
+    "removePhoto": "Kuraho ifoto",
+    "changePhoto": "Hindura ifoto",
+    "passwordTitle": "Ijambobanga",
+    "passwordDesc": "Kugira ngo uhindure ijambobanga, tuzakohereza link kuri imeyili.",
+    "sendReset": "Ohereza link yo guhindura",
+    "dangerZone": "Aho hari akaga",
+    "deleteDesc": "Gusiba konti ni burundu.",
+    "deleteBtn": "Siba konti yanjye"
+  },
+  "vendorStatus": {
+    "verifiedBadge": "Umucuruzi wemejwe",
+    "requestVerification": "Saba kugenzurwa",
+    "verificationTitle": "Bona ikimenyetso cyo kwemezwa",
+    "verificationDesc": "Abacuruzi bemejwe baboneka kenshi.",
+    "requestViaWhatsApp": "Saba kugenzurwa kuri WhatsApp"
+  }
 }
