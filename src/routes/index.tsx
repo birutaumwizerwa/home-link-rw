@@ -2,13 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, Bookmark, MessageCircle, Search as SearchIcon } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchListings } from "@/lib/listings-query";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { FREE_POST_LIMIT } from "@/lib/constants";
 const heroImg = "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1400&q=75&auto=format&fit=crop";
 
 export const Route = createFileRoute("/")({
