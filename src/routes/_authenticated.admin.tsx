@@ -200,7 +200,7 @@ function Subscriptions() {
               <Button size="sm" variant="outline" onClick={async () => {
                 await supabase.from("subscriptions").update({ is_active: !ss.is_active }).eq("id", ss.id);
                 if (!ss.is_active) {
-                  await supabase.from("vendors").update({ subscription_status: ss.plan, subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ss.vendor_id);
+                  await supabase.from("vendors").update({ subscription_status: ss.plan as "basic" | "pro", subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ss.vendor_id);
                 } else {
                   await supabase.from("vendors").update({ subscription_status: "free" }).eq("id", ss.vendor_id);
                 }
