@@ -93,8 +93,19 @@ function SignInForm() {
   const submit = async (v: z.infer<typeof signinSchema>) => {
     const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
     if (error) { toast.error(error.message); return; }
-    toast.success("Welcome back");
-    navigate({ to: "/" });
+
+    // Fetch roles to redirect to the right experience
+    const uid = (await supabase.auth.getUser()).data.user?.id;
+    let roles: string[] = [];
+    if (uid) {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+      roles = (data ?? []).map((r) => r.role as string);
+    }
+
+    toast.success("Welcome back!");
+    if (roles.includes("admin")) navigate({ to: "/admin" });
+    else if (roles.includes("vendor")) navigate({ to: "/dashboard" });
+    else navigate({ to: "/" });
   };
 
   return (
