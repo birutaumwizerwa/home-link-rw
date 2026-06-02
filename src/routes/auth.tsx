@@ -127,6 +127,7 @@ function SignInForm() {
 function SignUpForm() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { refresh } = useAuth();
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: { full_name: "", phone: "", location: "", email: "", password: "", is_vendor: false },
@@ -171,12 +172,15 @@ function SignUpForm() {
         return;
       }
 
-      // 3. Create role in user_roles table (THIS WAS MISSING!)
+      // 3. Delete any existing roles first to prevent duplicates (in case of DB triggers)
+      await supabase.from("user_roles").delete().eq("user_id", userId);
+
+      // 4. Create ONLY the selected role using UPSERT to prevent duplicates
       const role = v.is_vendor ? "vendor" : "client";
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: userId,
-        role: role,
-      });
+      const { error: roleError } = await supabase.from("user_roles").upsert(
+        { user_id: userId, role: role },
+        { onConflict: "user_id,role" }
+      );
       
       if (roleError) {
         console.error("Role creation error:", roleError);
@@ -184,7 +188,7 @@ function SignUpForm() {
         return;
       }
 
-      // 4. If vendor, create vendor record
+      // 5. If vendor, create vendor record
       if (v.is_vendor) {
         const { error: vendorError } = await supabase.from("vendors").insert({
           id: userId,
@@ -202,7 +206,13 @@ function SignUpForm() {
         }
       }
 
-      toast.success("Account created! Welcome to HomeLink Rwanda 🇷�");
+      toast.success("Account created! Welcome to HomeLink Rwanda 🇷🇼");
+      
+      // 6. Refresh auth context to pick up new role
+      await refresh();
+      
+      // Small delay to ensure state has updated
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Redirect based on role
       if (v.is_vendor) {
