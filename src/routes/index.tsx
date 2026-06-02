@@ -153,17 +153,37 @@ function Index() {
           )}
         </section>
 
-        <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-2xl font-bold sm:text-3xl">{t("home.ctaTitle")}</h3>
-              <p className="mt-2 max-w-xl text-white/90">{t("home.ctaSubtitle")}</p>
+        {!isVendor && !isAdmin && (
+          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold sm:text-3xl">{t("home.ctaTitle")}</h3>
+                <p className="mt-2 max-w-xl text-white/90">{t("home.ctaSubtitle")}</p>
+              </div>
+              <Button asChild size="lg" variant="secondary" className="rounded-xl">
+                <Link to={isAuthenticated ? "/post-listing" : "/auth"} search={isAuthenticated ? undefined as never : ({ mode: "signup" } as never)}>{t("home.ctaBtn")}</Link>
+              </Button>
             </div>
-            <Button asChild size="lg" variant="secondary" className="rounded-xl">
-              <Link to="/auth" search={{ mode: "signup" } as never}>{t("home.ctaBtn")}</Link>
-            </Button>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {isVendor && !isAdmin && (
+          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold sm:text-3xl">Ready to post another listing?</h3>
+                <p className="mt-2 max-w-xl text-white/90">
+                  {(vendor?.free_posts_used ?? 0) < FREE_POST_LIMIT
+                    ? `You have ${FREE_POST_LIMIT - (vendor?.free_posts_used ?? 0)} free post(s) remaining.`
+                    : "You've used your free posts. Upgrade for unlimited listings."}
+                </p>
+              </div>
+              <Button asChild size="lg" variant="secondary" className="rounded-xl">
+                <Link to="/post-listing">Post a listing</Link>
+              </Button>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
