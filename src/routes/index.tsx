@@ -100,6 +100,27 @@ function Index() {
         </div>
       </section>
 
+      {/* Client welcome banner */}
+      {isAuthenticated && !isVendor && !isAdmin && (
+        <section className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
+          <div className="flex flex-col gap-4 rounded-2xl border bg-primary/5 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">
+                Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}! 👋
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                You have full access to browse, save and contact vendors directly.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline" size="sm"><Link to="/search"><SearchIcon className="mr-1.5 h-4 w-4" /> Search</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/saved"><Bookmark className="mr-1.5 h-4 w-4" /> Saved</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/messages"><MessageCircle className="mr-1.5 h-4 w-4" /> Messages</Link></Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-12 sm:px-6">
         {/* Categories */}
         <section className="mb-12">
