@@ -171,6 +171,51 @@ function Users() {
   );
 }
 
+function Subscriptions() {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["admin", "subscriptions"],
+    queryFn: async () =>
+      (await supabase
+        .from("subscriptions")
+        .select("id, vendor_id, plan, price_rwf, payment_reference, expires_at, is_active, vendor:vendors!subscriptions_vendor_id_fkey(business_name, profile:profiles!vendors_id_fkey(full_name))")
+        .order("created_at", { ascending: false })
+      ).data ?? [],
+  });
+
+  return (
+    <Table headers={["Vendor", "Plan", "Price", "Reference", "Expires", "Status", ""]}>
+      {(data ?? []).map((s) => {
+        const ss = s as { id: string; vendor_id: string; plan: string; price_rwf: number | null; payment_reference: string | null; expires_at: string | null; is_active: boolean; vendor: { business_name: string | null; profile: { full_name: string } | null } | null };
+        const name = ss.vendor?.business_name || ss.vendor?.profile?.full_name || ss.vendor_id.slice(0, 8);
+        return (
+          <tr key={ss.id} className="border-t">
+            <td className="p-3 font-medium">{name}</td>
+            <td className="p-3 uppercase">{ss.plan}</td>
+            <td className="p-3">{ss.price_rwf?.toLocaleString() ?? "—"}</td>
+            <td className="p-3">{ss.payment_reference ?? "—"}</td>
+            <td className="p-3">{ss.expires_at ? new Date(ss.expires_at).toLocaleDateString() : "—"}</td>
+            <td className="p-3">{ss.is_active ? <Badge>Active</Badge> : <Badge variant="outline">Expired</Badge>}</td>
+            <td className="p-3 text-right">
+              <Button size="sm" variant="outline" onClick={async () => {
+                await supabase.from("subscriptions").update({ is_active: !ss.is_active }).eq("id", ss.id);
+                if (!ss.is_active) {
+                  await supabase.from("vendors").update({ subscription_status: ss.plan, subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ss.vendor_id);
+                } else {
+                  await supabase.from("vendors").update({ subscription_status: "free" }).eq("id", ss.vendor_id);
+                }
+                qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+                toast.success(ss.is_active ? "Subscription deactivated" : "Subscription reactivated");
+              }}>{ss.is_active ? "Deactivate" : "Reactivate"}</Button>
+            </td>
+          </tr>
+        );
+      })}
+    </Table>
+  );
+}
+
+
 function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
   return (
     <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
