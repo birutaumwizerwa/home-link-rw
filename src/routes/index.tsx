@@ -44,9 +44,16 @@ function Index() {
   const { t } = useTranslation();
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const { isAuthenticated, isVendor, isAdmin, profile, user } = useAuth();
 
   const featured = useQuery({ queryKey: ["listings", "featured"], queryFn: () => fetchListings({ featured: true, limit: 4 }) });
   const latest = useQuery({ queryKey: ["listings", "latest"], queryFn: () => fetchListings({ limit: 8 }) });
+
+  const { data: vendor } = useQuery({
+    queryKey: ["vendor", user?.id],
+    enabled: !!user && isVendor,
+    queryFn: async () => (await supabase.from("vendors").select("free_posts_used").eq("id", user!.id).maybeSingle()).data,
+  });
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
