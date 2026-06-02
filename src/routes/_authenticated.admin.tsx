@@ -25,18 +25,28 @@ function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
-        <h1 className="mb-6 text-3xl font-bold">Admin panel</h1>
+        <div className="mb-6 flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">Admin panel</h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+              <span className="h-2 w-2 rounded-full bg-primary" /> Platform online
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">HomeLink Rwanda — Control Center</p>
+        </div>
         <Tabs defaultValue="pending">
           <TabsList>
             <TabsTrigger value="pending">Pending listings</TabsTrigger>
             <TabsTrigger value="vendors">Vendors</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
           </TabsList>
           <TabsContent value="pending"><PendingListings /></TabsContent>
           <TabsContent value="vendors"><Vendors /></TabsContent>
           <TabsContent value="reports"><Reports /></TabsContent>
           <TabsContent value="users"><Users /></TabsContent>
+          <TabsContent value="subscriptions"><Subscriptions /></TabsContent>
         </Tabs>
       </main>
       <Footer />
