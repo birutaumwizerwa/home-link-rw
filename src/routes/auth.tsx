@@ -66,7 +66,7 @@ function AuthPage() {
             const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
             if (r.error) toast.error(r.error.message);
           }}>
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32 29.4 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.3 2.8l5.7-5.7C33.6 7 28.9 5 24 5 13.5 5 5 13.5 5 24s8.5 19 19 19 19-8.5 19-19c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.1 6.6 4.8C14.5 15.1 18.9 12 24 12c2.8 0 5.4 1.1 7.3 2.8l5.7-5.7C33.6 6 28.9 5 24 5 16.4 5 9.8 9.4 6.3 14.1z"/><path fill="#4CAF50" d="M24 43c4.8 0 9.1-1.8 12.4-4.8l-5.7-4.8C28.7 35 26.4 36 24 36c-5.3 0-9.8-3-11.3-7.2L6 33.5C9.4 38.6 16.1 43 24 43z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2 3.7-3.7 4.9l5.7 4.8c-.4.4 6.7-4.9 6.7-13.7 0-1.3-.1-2.3-.4-3.5z"/></svg>
+            <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32 29.4 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.3 2.8l5.7-5.[...]
             {t("auth.withGoogle")}
           </Button>
 
@@ -133,19 +133,87 @@ function SignUpForm() {
   });
 
   const submit = async (v: z.infer<typeof signupSchema>) => {
-    const { error } = await supabase.auth.signUp({
-      email: v.email,
-      password: v.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: v.full_name, phone: v.phone, location: v.location, is_vendor: v.is_vendor ? "true" : "false" },
-      },
-    });
-    if (error) { toast.error(error.message); return; }
-    toast.success("Account created! Welcome to HomeLink Rwanda 🇷🇼");
-    // New vendors go straight to their dashboard, clients go home
-    if (v.is_vendor) navigate({ to: "/dashboard" });
-    else navigate({ to: "/" });
+    try {
+      // 1. Create Supabase Auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: v.email,
+        password: v.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: { full_name: v.full_name, phone: v.phone, location: v.location, is_vendor: v.is_vendor ? "true" : "false" },
+        },
+      });
+      
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
+
+      const userId = authData.user?.id;
+      if (!userId) {
+        toast.error("Failed to create account");
+        return;
+      }
+
+      // 2. Create profile record
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: userId,
+        full_name: v.full_name,
+        phone: v.phone,
+        location: v.location,
+        avatar_url: null,
+        is_banned: false,
+      });
+      
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        toast.error("Failed to create profile");
+        return;
+      }
+
+      // 3. Create role in user_roles table (THIS WAS MISSING!)
+      const role = v.is_vendor ? "vendor" : "client";
+      const { error: roleError } = await supabase.from("user_roles").insert({
+        user_id: userId,
+        role: role,
+      });
+      
+      if (roleError) {
+        console.error("Role creation error:", roleError);
+        toast.error("Failed to set user role");
+        return;
+      }
+
+      // 4. If vendor, create vendor record
+      if (v.is_vendor) {
+        const { error: vendorError } = await supabase.from("vendors").insert({
+          id: userId,
+          business_name: null,
+          whatsapp_number: null,
+          is_verified: false,
+          subscription_status: "free",
+          free_posts_used: 0,
+        });
+        
+        if (vendorError) {
+          console.error("Vendor creation error:", vendorError);
+          toast.error("Failed to create vendor account");
+          return;
+        }
+      }
+
+      toast.success("Account created! Welcome to HomeLink Rwanda 🇷�");
+      
+      // Redirect based on role
+      if (v.is_vendor) {
+        navigate({ to: "/dashboard" });
+      } else {
+        navigate({ to: "/" });
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      toast.error("An unexpected error occurred");
+    }
   };
 
   return (
