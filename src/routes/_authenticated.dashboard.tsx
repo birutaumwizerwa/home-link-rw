@@ -63,6 +63,13 @@ function DashboardPage() {
   const free = vendor?.subscription_status === "free";
   const used = vendor?.free_posts_used ?? 0;
   const sub = vendor?.subscription_status ?? "free";
+  const isNewVendor = (listings?.length ?? 0) === 0 && !vendor?.is_verified;
+
+  const onboardingSteps = [
+    { step: "1", title: "Post your first listing", desc: "You have 3 free posts. Add photos, price and location.", to: "/post-listing" as const, done: (listings?.length ?? 0) > 0 },
+    { step: "2", title: "Add your WhatsApp", desc: "Clients need your number to contact you directly.", to: "/profile" as const, done: !!vendor?.whatsapp_number },
+    { step: "3", title: "Get verified", desc: "Verified vendors get 3× more views and a trust badge.", to: null, done: vendor?.is_verified ?? false },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -72,6 +79,32 @@ function DashboardPage() {
           <h1 className="text-3xl font-bold">Vendor dashboard</h1>
           <Button asChild><Link to="/post-listing"><Plus className="mr-1.5 h-4 w-4" /> New listing</Link></Button>
         </div>
+
+        {isNewVendor && (
+          <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-6">
+            <h2 className="text-xl font-bold">Welcome to HomeLink Rwanda! 🎉</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your vendor account is active. Here's how to get started and attract your first tenants.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {onboardingSteps.map((s) => (
+                <div key={s.step} className="rounded-xl border bg-card p-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`grid h-7 w-7 place-items-center rounded-full text-sm font-bold ${s.done ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                      {s.done ? "✓" : s.step}
+                    </span>
+                    <span className="font-semibold">{s.title}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">{s.desc}</p>
+                  {s.to && !s.done && (
+                    <Button asChild size="sm" variant="outline" className="mt-3"><Link to={s.to}>Go</Link></Button>
+                  )}
+                  {s.done && <span className="mt-3 inline-block text-xs font-medium text-primary">✓ Done</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 rounded-xl border bg-card p-5">
           {free ? (
