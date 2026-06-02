@@ -25,18 +25,28 @@ function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
-        <h1 className="mb-6 text-3xl font-bold">Admin panel</h1>
+        <div className="mb-6 flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">Admin panel</h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+              <span className="h-2 w-2 rounded-full bg-primary" /> Platform online
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">HomeLink Rwanda — Control Center</p>
+        </div>
         <Tabs defaultValue="pending">
           <TabsList>
             <TabsTrigger value="pending">Pending listings</TabsTrigger>
             <TabsTrigger value="vendors">Vendors</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
           </TabsList>
           <TabsContent value="pending"><PendingListings /></TabsContent>
           <TabsContent value="vendors"><Vendors /></TabsContent>
           <TabsContent value="reports"><Reports /></TabsContent>
           <TabsContent value="users"><Users /></TabsContent>
+          <TabsContent value="subscriptions"><Subscriptions /></TabsContent>
         </Tabs>
       </main>
       <Footer />
@@ -97,6 +107,17 @@ function Vendors() {
                 qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
                 toast.success("Activated Pro for 30 days");
               }}>Activate Pro 30d</Button>
+              <Button size="sm" variant="secondary" onClick={async () => {
+                const plan = window.prompt("Plan (basic / pro):") as "basic" | "pro" | null;
+                const ref = window.prompt("MoMo payment reference:");
+                if (!plan || !ref) return;
+                const price = plan === "pro" ? 15000 : 5000;
+                const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                await supabase.from("subscriptions").insert({ vendor_id: vv.id, plan, price_rwf: price, payment_reference: ref, expires_at: expires, is_active: true });
+                await supabase.from("vendors").update({ subscription_status: plan, subscription_expires_at: expires }).eq("id", vv.id);
+                qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
+                toast.success(`${plan} plan activated`);
+              }}>Activate plan</Button>
             </td>
           </tr>
         );
@@ -149,6 +170,51 @@ function Users() {
     </Table>
   );
 }
+
+function Subscriptions() {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["admin", "subscriptions"],
+    queryFn: async () =>
+      (await supabase
+        .from("subscriptions")
+        .select("id, vendor_id, plan, price_rwf, payment_reference, expires_at, is_active, vendor:vendors!subscriptions_vendor_id_fkey(business_name, profile:profiles!vendors_id_fkey(full_name))")
+        .order("created_at", { ascending: false })
+      ).data ?? [],
+  });
+
+  return (
+    <Table headers={["Vendor", "Plan", "Price", "Reference", "Expires", "Status", ""]}>
+      {(data ?? []).map((s) => {
+        const ss = s as { id: string; vendor_id: string; plan: string; price_rwf: number | null; payment_reference: string | null; expires_at: string | null; is_active: boolean; vendor: { business_name: string | null; profile: { full_name: string } | null } | null };
+        const name = ss.vendor?.business_name || ss.vendor?.profile?.full_name || ss.vendor_id.slice(0, 8);
+        return (
+          <tr key={ss.id} className="border-t">
+            <td className="p-3 font-medium">{name}</td>
+            <td className="p-3 uppercase">{ss.plan}</td>
+            <td className="p-3">{ss.price_rwf?.toLocaleString() ?? "—"}</td>
+            <td className="p-3">{ss.payment_reference ?? "—"}</td>
+            <td className="p-3">{ss.expires_at ? new Date(ss.expires_at).toLocaleDateString() : "—"}</td>
+            <td className="p-3">{ss.is_active ? <Badge>Active</Badge> : <Badge variant="outline">Expired</Badge>}</td>
+            <td className="p-3 text-right">
+              <Button size="sm" variant="outline" onClick={async () => {
+                await supabase.from("subscriptions").update({ is_active: !ss.is_active }).eq("id", ss.id);
+                if (!ss.is_active) {
+                  await supabase.from("vendors").update({ subscription_status: ss.plan as "basic" | "pro", subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ss.vendor_id);
+                } else {
+                  await supabase.from("vendors").update({ subscription_status: "free" }).eq("id", ss.vendor_id);
+                }
+                qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+                toast.success(ss.is_active ? "Subscription deactivated" : "Subscription reactivated");
+              }}>{ss.is_active ? "Deactivate" : "Reactivate"}</Button>
+            </td>
+          </tr>
+        );
+      })}
+    </Table>
+  );
+}
+
 
 function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
   return (

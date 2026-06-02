@@ -46,10 +46,11 @@ const MAX_IMAGES = 10;
 const MAX_BYTES = 5 * 1024 * 1024;
 
 function PostListingPage() {
-  const { user, isVendor } = useAuth();
+  const { user, isVendor, refresh } = useAuth();
   const navigate = useNavigate();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
 
   const { data: vendor } = useQuery({
     queryKey: ["vendor", user?.id],
@@ -132,7 +133,65 @@ function PostListingPage() {
   };
 
   if (!isVendor) {
-    return <><Navbar /><div className="mx-auto max-w-xl p-8 text-center"><h1 className="text-2xl font-bold">Vendor account required</h1></div></>;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12 sm:px-6">
+          <div className="rounded-2xl border bg-card p-8 text-center shadow-card">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-3xl">🏢</div>
+            <h1 className="mt-4 text-2xl font-bold">Become a vendor to post listings</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              You currently have a client account. To post properties and reach thousands of renters,
+              you need a vendor account.
+            </p>
+
+            <div className="mt-6 rounded-xl border bg-muted/30 p-5 text-left">
+              <p className="text-sm font-semibold">What you get as a vendor:</p>
+              <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                <li>✓ 3 free listings to start</li>
+                <li>✓ Your own vendor profile page</li>
+                <li>✓ Direct messages from interested renters</li>
+                <li>✓ Verified badge after ID check</li>
+                <li>✓ Upgrade to post unlimited listings</li>
+              </ul>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <Button
+                className="w-full"
+                size="lg"
+                disabled={upgrading}
+                onClick={async () => {
+                  if (!user) return;
+                  setUpgrading(true);
+                  try {
+                    const { error } = await supabase
+                      .from("user_roles")
+                      .upsert({ user_id: user.id, role: "vendor" }, { onConflict: "user_id,role", ignoreDuplicates: true });
+                    if (error) throw error;
+                    await supabase
+                      .from("vendors")
+                      .upsert({ id: user.id, free_posts_used: 0, subscription_status: "free" }, { onConflict: "id", ignoreDuplicates: true });
+                    await refresh();
+                    toast.success("Your account has been upgraded to vendor!");
+                  } catch {
+                    toast.error("Failed to upgrade account. Please try again.");
+                  } finally {
+                    setUpgrading(false);
+                  }
+                }}
+              >
+                {upgrading ? "Upgrading..." : "Upgrade to vendor account — it's free"}
+              </Button>
+              <Button variant="ghost" className="w-full" onClick={() => navigate({ to: "/" })}>
+                Back to browsing
+              </Button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

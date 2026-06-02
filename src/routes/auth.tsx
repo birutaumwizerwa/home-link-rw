@@ -93,8 +93,19 @@ function SignInForm() {
   const submit = async (v: z.infer<typeof signinSchema>) => {
     const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
     if (error) { toast.error(error.message); return; }
-    toast.success("Welcome back");
-    navigate({ to: "/" });
+
+    // Fetch roles to redirect to the right experience
+    const uid = (await supabase.auth.getUser()).data.user?.id;
+    let roles: string[] = [];
+    if (uid) {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+      roles = (data ?? []).map((r) => r.role as string);
+    }
+
+    toast.success("Welcome back!");
+    if (roles.includes("admin")) navigate({ to: "/admin" });
+    else if (roles.includes("vendor")) navigate({ to: "/dashboard" });
+    else navigate({ to: "/" });
   };
 
   return (
@@ -131,8 +142,10 @@ function SignUpForm() {
       },
     });
     if (error) { toast.error(error.message); return; }
-    toast.success("Account created");
-    navigate({ to: "/" });
+    toast.success("Account created! Welcome to HomeLink Rwanda 🇷🇼");
+    // New vendors go straight to their dashboard, clients go home
+    if (v.is_vendor) navigate({ to: "/dashboard" });
+    else navigate({ to: "/" });
   };
 
   return (
@@ -166,15 +179,27 @@ function SignUpForm() {
         {form.formState.errors.password && <p className="mt-1 text-xs text-destructive">{form.formState.errors.password.message}</p>}
       </div>
       <div>
-        <Label className="mb-2 block">{t("auth.iAmA")}</Label>
-        <div className="grid grid-cols-2 gap-2">
+        <Label className="mb-2 block">I am a...</Label>
+        <div className="grid grid-cols-2 gap-3">
           <button type="button" onClick={() => form.setValue("is_vendor", false)}
-            className={`rounded-md border p-3 text-sm font-medium ${!form.watch("is_vendor") ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"}`}>
-            {t("auth.asClient")}
+            className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-4 text-center transition ${
+              !form.watch("is_vendor")
+                ? "border-primary bg-primary/10 shadow-sm"
+                : "border-border hover:border-primary/40 hover:bg-muted/50"
+            }`}>
+            <span className="text-2xl">🏠</span>
+            <span className="text-sm font-semibold">Looking for a home</span>
+            <span className="text-xs text-muted-foreground">Browse, save and contact landlords</span>
           </button>
           <button type="button" onClick={() => form.setValue("is_vendor", true)}
-            className={`rounded-md border p-3 text-sm font-medium ${form.watch("is_vendor") ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"}`}>
-            {t("auth.asVendor")}
+            className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-4 text-center transition ${
+              form.watch("is_vendor")
+                ? "border-primary bg-primary/10 shadow-sm"
+                : "border-border hover:border-primary/40 hover:bg-muted/50"
+            }`}>
+            <span className="text-2xl">🏢</span>
+            <span className="text-sm font-semibold">Landlord / Broker</span>
+            <span className="text-xs text-muted-foreground">Post listings and find tenants</span>
           </button>
         </div>
       </div>

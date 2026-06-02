@@ -37,13 +37,32 @@ export function Navbar() {
         </Link>
 
         <nav className="ml-2 hidden items-center gap-1 md:flex">
-          <Link to="/search" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
-            {t("nav.search")}
-          </Link>
-          {isVendor && (
-            <Link to="/post-listing" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
-              {t("nav.post")}
+          {isAdmin && (
+            <Link to="/admin" className="rounded-md px-3 py-2 text-sm font-semibold text-destructive hover:bg-destructive/10">
+              {t("nav.admin")}
             </Link>
+          )}
+          {isVendor && !isAdmin && (
+            <>
+              <Link to="/post-listing" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                {t("nav.post")}
+              </Link>
+              <Link to="/dashboard" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                {t("nav.dashboard")}
+              </Link>
+            </>
+          )}
+          {!isVendor && !isAdmin && (
+            <>
+              <Link to="/search" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                {t("nav.search")}
+              </Link>
+              {isAuthenticated && (
+                <Link to="/saved" className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                  {t("nav.saved")}
+                </Link>
+              )}
+            </>
           )}
         </nav>
 

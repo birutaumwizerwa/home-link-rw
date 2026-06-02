@@ -2,13 +2,16 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, Bookmark, MessageCircle, Search as SearchIcon } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchListings } from "@/lib/listings-query";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { FREE_POST_LIMIT } from "@/lib/constants";
 const heroImg = "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1400&q=75&auto=format&fit=crop";
 
 export const Route = createFileRoute("/")({
@@ -41,9 +44,16 @@ function Index() {
   const { t } = useTranslation();
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const { isAuthenticated, isVendor, isAdmin, profile, user } = useAuth();
 
   const featured = useQuery({ queryKey: ["listings", "featured"], queryFn: () => fetchListings({ featured: true, limit: 4 }) });
   const latest = useQuery({ queryKey: ["listings", "latest"], queryFn: () => fetchListings({ limit: 8 }) });
+
+  const { data: vendor } = useQuery({
+    queryKey: ["vendor", user?.id],
+    enabled: !!user && isVendor,
+    queryFn: async () => (await supabase.from("vendors").select("free_posts_used").eq("id", user!.id).maybeSingle()).data,
+  });
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +100,27 @@ function Index() {
         </div>
       </section>
 
+      {/* Client welcome banner */}
+      {isAuthenticated && !isVendor && !isAdmin && (
+        <section className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
+          <div className="flex flex-col gap-4 rounded-2xl border bg-primary/5 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">
+                Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}! 👋
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                You have full access to browse, save and contact vendors directly.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline" size="sm"><Link to="/search"><SearchIcon className="mr-1.5 h-4 w-4" /> Search</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/saved"><Bookmark className="mr-1.5 h-4 w-4" /> Saved</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to="/messages"><MessageCircle className="mr-1.5 h-4 w-4" /> Messages</Link></Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-12 sm:px-6">
         {/* Categories */}
         <section className="mb-12">
@@ -122,17 +153,37 @@ function Index() {
           )}
         </section>
 
-        <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-2xl font-bold sm:text-3xl">{t("home.ctaTitle")}</h3>
-              <p className="mt-2 max-w-xl text-white/90">{t("home.ctaSubtitle")}</p>
+        {!isVendor && !isAdmin && (
+          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold sm:text-3xl">{t("home.ctaTitle")}</h3>
+                <p className="mt-2 max-w-xl text-white/90">{t("home.ctaSubtitle")}</p>
+              </div>
+              <Button asChild size="lg" variant="secondary" className="rounded-xl">
+                <Link to={isAuthenticated ? "/post-listing" : "/auth"} search={isAuthenticated ? undefined as never : ({ mode: "signup" } as never)}>{t("home.ctaBtn")}</Link>
+              </Button>
             </div>
-            <Button asChild size="lg" variant="secondary" className="rounded-xl">
-              <Link to="/auth" search={{ mode: "signup" } as never}>{t("home.ctaBtn")}</Link>
-            </Button>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {isVendor && !isAdmin && (
+          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold sm:text-3xl">Ready to post another listing?</h3>
+                <p className="mt-2 max-w-xl text-white/90">
+                  {(vendor?.free_posts_used ?? 0) < FREE_POST_LIMIT
+                    ? `You have ${FREE_POST_LIMIT - (vendor?.free_posts_used ?? 0)} free post(s) remaining.`
+                    : "You've used your free posts. Upgrade for unlimited listings."}
+                </p>
+              </div>
+              <Button asChild size="lg" variant="secondary" className="rounded-xl">
+                <Link to="/post-listing">Post a listing</Link>
+              </Button>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
