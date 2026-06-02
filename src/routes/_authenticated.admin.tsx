@@ -107,6 +107,17 @@ function Vendors() {
                 qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
                 toast.success("Activated Pro for 30 days");
               }}>Activate Pro 30d</Button>
+              <Button size="sm" variant="secondary" onClick={async () => {
+                const plan = window.prompt("Plan (basic / pro):") as "basic" | "pro" | null;
+                const ref = window.prompt("MoMo payment reference:");
+                if (!plan || !ref) return;
+                const price = plan === "pro" ? 15000 : 5000;
+                const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                await supabase.from("subscriptions").insert({ vendor_id: vv.id, plan, price_rwf: price, payment_reference: ref, expires_at: expires, is_active: true });
+                await supabase.from("vendors").update({ subscription_status: plan, subscription_expires_at: expires }).eq("id", vv.id);
+                qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
+                toast.success(`${plan} plan activated`);
+              }}>Activate plan</Button>
             </td>
           </tr>
         );
