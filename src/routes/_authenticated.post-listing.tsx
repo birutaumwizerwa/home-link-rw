@@ -46,10 +46,11 @@ const MAX_IMAGES = 10;
 const MAX_BYTES = 5 * 1024 * 1024;
 
 function PostListingPage() {
-  const { user, isVendor } = useAuth();
+  const { user, isVendor, refresh } = useAuth();
   const navigate = useNavigate();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
 
   const { data: vendor } = useQuery({
     queryKey: ["vendor", user?.id],
