@@ -8,7 +8,7 @@ create type public.sub_status as enum ('free', 'basic', 'pro');
 create type public.sub_plan as enum ('basic', 'pro');
 
 -- PROFILES
-CREATE TABLE IF NOT EXISTS public.profiles (
+create table public.profiles (
   id uuid primary key references auth.users on delete cascade,
   full_name text not null,
   phone text,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 -- USER_ROLES (separate for security; admin can never be self-assigned)
-CREATE TABLE IF NOT EXISTS public.user_roles (
+create table public.user_roles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users on delete cascade,
   role app_role not null,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.user_roles (
 );
 
 -- VENDORS
-CREATE TABLE IF NOT EXISTS public.vendors (
+create table public.vendors (
   id uuid primary key references public.profiles(id) on delete cascade,
   business_name text,
   whatsapp_number text,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS public.vendors (
 );
 
 -- LISTINGS
-CREATE TABLE IF NOT EXISTS public.listings (
+create table public.listings (
   id uuid primary key default gen_random_uuid(),
   vendor_id uuid not null references public.vendors(id) on delete cascade,
   title text not null,
@@ -77,7 +77,7 @@ create index listings_type_idx on public.listings(listing_type, property_type);
 create index listings_approved_idx on public.listings(is_approved, is_available);
 
 -- LISTING IMAGES
-CREATE TABLE IF NOT EXISTS public.listing_images (
+create table public.listing_images (
   id uuid primary key default gen_random_uuid(),
   listing_id uuid not null references public.listings on delete cascade,
   image_url text not null,
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.listing_images (
 );
 
 -- SAVED LISTINGS
-CREATE TABLE IF NOT EXISTS public.saved_listings (
+create table public.saved_listings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users on delete cascade,
   listing_id uuid not null references public.listings on delete cascade,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS public.saved_listings (
 );
 
 -- CHATS
-CREATE TABLE IF NOT EXISTS public.chats (
+create table public.chats (
   id uuid primary key default gen_random_uuid(),
   client_id uuid not null references auth.users on delete cascade,
   vendor_id uuid not null references auth.users on delete cascade,
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS public.chats (
 );
 
 -- MESSAGES
-CREATE TABLE IF NOT EXISTS public.messages (
+create table public.messages (
   id uuid primary key default gen_random_uuid(),
   chat_id uuid not null references public.chats on delete cascade,
   sender_id uuid not null references auth.users on delete cascade,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
 create index messages_chat_idx on public.messages(chat_id, created_at);
 
 -- REPORTS
-CREATE TABLE IF NOT EXISTS public.reports (
+create table public.reports (
   id uuid primary key default gen_random_uuid(),
   reporter_id uuid references auth.users on delete set null,
   listing_id uuid not null references public.listings on delete cascade,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS public.reports (
 );
 
 -- SUBSCRIPTIONS
-CREATE TABLE IF NOT EXISTS public.subscriptions (
+create table public.subscriptions (
   id uuid primary key default gen_random_uuid(),
   vendor_id uuid not null references public.vendors on delete cascade,
   plan sub_plan not null,
