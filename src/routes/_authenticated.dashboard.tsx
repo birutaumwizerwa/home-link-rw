@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, BadgeCheck } from "lucide-react";
@@ -7,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { VendorProfileForm } from "@/components/vendor/VendorProfileForm";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchListings } from "@/lib/listings-query";
@@ -19,6 +21,60 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Vendor dashboard" }] }),
   component: DashboardPage,
 });
+
+// Vendor Profile Form Component (inline to avoid missing import)
+function VendorProfileForm({ vendor, profile, userId, onSave }: { 
+  vendor: any; 
+  profile: { full_name: string; phone: string | null } | null; 
+  userId: string; 
+  onSave: () => void;
+}) {
+  const [fullName, setFullName] = useState(profile?.full_name || "");
+  const [phone, setPhone] = useState(profile?.phone || "");
+  const [businessName, setBusinessName] = useState(vendor?.business_name || "");
+  const [whatsappNumber, setWhatsappNumber] = useState(vendor?.whatsapp_number || "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await Promise.all([
+        supabase.from("profiles").update({ full_name: fullName, phone: phone || null }).eq("id", userId),
+        supabase.from("vendors").update({ business_name: businessName || null, whatsapp_number: whatsappNumber || null }).eq("id", userId),
+      ]);
+      toast.success("Profile updated");
+      onSave();
+    } catch {
+      toast.error("Failed to update");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="max-w-lg space-y-4 rounded-xl border bg-card p-6">
+      <h3 className="text-lg font-semibold">Edit your profile</h3>
+      <div>
+        <Label>Full name</Label>
+        <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
+      </div>
+      <div>
+        <Label>Phone number</Label>
+        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXXXXXXX" />
+      </div>
+      <div>
+        <Label>Business / Agency name (optional)</Label>
+        <Input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Kigali Properties Ltd" />
+      </div>
+      <div>
+        <Label>WhatsApp number *</Label>
+        <Input value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="07XXXXXXXX" />
+        <p className="mt-1 text-xs text-muted-foreground">This is shown to clients on your listings</p>
+      </div>
+      <Button onClick={handleSave} disabled={isSaving}>{isSaving ? "Saving..." : "Save changes"}</Button>
+    </div>
+  );
+}
 
 function DashboardPage() {
   const { user, isVendor } = useAuth();

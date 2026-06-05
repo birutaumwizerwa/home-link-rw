@@ -134,17 +134,28 @@ function SignInForm() {
   const form = useForm<z.infer<typeof signinSchema>>({ resolver: zodResolver(signinSchema), defaultValues: { email: "", password: "" } });
 
   const submit = async (v: z.infer<typeof signinSchema>) => {
-    const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
-    if (error) { toast.error(error.message); return; }
+    // Use the login response directly instead of calling getUser() again
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({ 
+      email: v.email, 
+      password: v.password 
+    });
+    
+    if (error) { 
+      toast.error(error.message); 
+      return; 
+    }
 
-    const uid = (await supabase.auth.getUser()).data.user?.id;
+    const userId = signInData.user?.id;
     let roles: string[] = [];
-    if (uid) {
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+    
+    if (userId) {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
       roles = (data ?? []).map((r) => r.role as string);
     }
 
     toast.success("Welcome back!");
+    
+    // Admin goes to /admin, Vendor to /dashboard, Client to home
     if (roles.includes("admin")) navigate({ to: "/admin" });
     else if (roles.includes("vendor")) navigate({ to: "/dashboard" });
     else navigate({ to: "/" });
