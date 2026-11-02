@@ -1,191 +1,204 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, ArrowRight, Bookmark, MessageCircle, Search as SearchIcon } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
+import { useTranslation } from "react-i18next";
+import { Building2, CalendarCheck, Globe2, Search, ShieldCheck } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
+import { ImigongoBand, ImigongoPanel } from "@/components/brand/Imigongo";
 import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchListings } from "@/lib/listings-query";
-import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
-import { FREE_POST_LIMIT } from "@/lib/constants";
-const heroImg = "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1400&q=75&auto=format&fit=crop";
+import { NEIGHBOURHOODS, neighbourhoodText } from "@/lib/neighbourhoods";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HomeLink Rwanda — Rentals & properties for sale" },
-      { name: "description", content: "Browse verified rentals and properties for sale across all 30 Rwandan districts." },
+      { title: "HomeLink Rwanda: homes for a few months or for good" },
+      {
+        name: "description",
+        content:
+          "Find apartments, houses and furnished medium to long-stay rentals across Rwanda. Book viewings in person or by video, compare homes and contact landlords directly.",
+      },
     ],
   }),
   component: Index,
 });
 
-const CATEGORIES = [
-  { label: "Houses", value: "house", emoji: "🏠" },
-  { label: "Apartments", value: "apartment", emoji: "🏢" },
-  { label: "Studios", value: "studio", emoji: "🛏️" },
-  { label: "Rooms", value: "room", emoji: "🚪" },
-  { label: "Villas", value: "villa", emoji: "🏡" },
-  { label: "Commercial", value: "commercial", emoji: "🏪" },
-];
-
-const STATS = [
-  { n: "500+", label: "Active listings" },
-  { n: "30", label: "Districts covered" },
-  { n: "1,200+", label: "Registered users" },
-  { n: "Free", label: "To join & browse" },
-];
+type Stay = "short" | "medium" | "long" | "buy";
+const STAYS: Stay[] = ["short", "medium", "long", "buy"];
 
 function Index() {
-  const { t } = useTranslation();
-  const [q, setQ] = useState("");
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated, isVendor, isAdmin, profile, user } = useAuth();
+  const [q, setQ] = useState("");
+  const [stay, setStay] = useState<Stay>("medium");
 
-  const featured = useQuery({ queryKey: ["listings", "featured"], queryFn: () => fetchListings({ featured: true, limit: 4 }) });
-  const latest = useQuery({ queryKey: ["listings", "latest"], queryFn: () => fetchListings({ limit: 8 }) });
-
-  const { data: vendor } = useQuery({
-    queryKey: ["vendor", user?.id],
-    enabled: !!user && isVendor,
-    queryFn: async () => (await supabase.from("vendors").select("free_posts_used").eq("id", user!.id).maybeSingle()).data,
+  const featured = useQuery({
+    queryKey: ["listings", "featured"],
+    queryFn: () => fetchListings({ featured: true, limit: 4 }),
+  });
+  const latest = useQuery({
+    queryKey: ["listings", "latest"],
+    queryFn: () => fetchListings({ limit: 8 }),
   });
 
-  const submitSearch = (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/search", search: { q } as never });
+    navigate({
+      to: "/search",
+      search: { q: q || undefined, ...(stay === "buy" ? { type: "sale" as const } : { stay }) },
+    });
   };
 
-  return (
-    <div className="min-h-screen flex flex-col pb-16 md:pb-0">
-      <Navbar />
+  const features = (featured.data?.length ?? 0) > 0;
+  const promises = [
+    {
+      icon: CalendarCheck,
+      title: t("home.promiseViewingTitle"),
+      body: t("home.promiseViewingBody"),
+    },
+    { icon: ShieldCheck, title: t("home.promiseTrustTitle"), body: t("home.promiseTrustBody") },
+    { icon: Globe2, title: t("home.promiseGlobalTitle"), body: t("home.promiseGlobalBody") },
+  ];
 
-      <section className="relative overflow-hidden text-primary-foreground">
-        <img src={heroImg} alt="Kigali, Rwanda at golden hour" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/30" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:py-28 sm:px-6">
-          <div className="max-w-3xl">
-            <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-sm font-medium backdrop-blur">🇷🇼 Rwanda's #1 property platform</span>
-            <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">{t("home.heroTitle")}</h1>
-            <p className="mt-4 max-w-xl text-base text-white/90 sm:text-lg">{t("home.heroSubtitle")}</p>
-            <form onSubmit={submitSearch} className="mt-8 flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-card-hover sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder={t("home.searchPlaceholder")}
-                  className="border-0 bg-transparent pl-9 text-foreground focus-visible:ring-0"
-                />
+  return (
+    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
+      <Navbar />
+      <section className="bg-ink text-white">
+        <div className="mx-auto grid max-w-7xl items-stretch lg:grid-cols-[1fr_400px]">
+          <div className="px-4 py-12 sm:px-6 sm:py-16 lg:py-24 lg:pr-12">
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.05] sm:text-6xl">
+              {t("home.heroTitle")}
+            </h1>
+            <p className="mt-4 max-w-xl text-lg text-white/80">{t("home.heroSubtitle")}</p>
+            <form
+              onSubmit={submit}
+              className="mt-8 max-w-2xl rounded-lg bg-card p-3 text-foreground sm:p-4"
+            >
+              <fieldset>
+                <legend className="mb-2 text-sm font-semibold">{t("home.stayQuestion")}</legend>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {STAYS.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      aria-pressed={stay === s}
+                      onClick={() => setStay(s)}
+                      className={`rounded-md border px-2 py-2 text-sm font-medium ${stay === s ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
+                    >
+                      {t(`home.stay.${s}`)}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    aria-label={t("home.searchPlaceholder")}
+                    placeholder={t("home.searchPlaceholder")}
+                    className="h-11 pl-9"
+                  />
+                </div>
+                <Button type="submit" className="h-11 px-8">
+                  {t("home.searchBtn")}
+                </Button>
               </div>
-              <Button type="submit" size="lg" className="rounded-xl">{t("home.searchBtn")}</Button>
             </form>
           </div>
-        </div>
-      </section>
-
-      {/* Stats bar */}
-      <section className="border-b bg-card">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-8 sm:grid-cols-4 sm:px-6">
-          {STATS.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-2xl font-bold text-primary sm:text-3xl">{s.n}</div>
-              <div className="text-xs text-muted-foreground sm:text-sm">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Client welcome banner */}
-      {isAuthenticated && !isVendor && !isAdmin && (
-        <section className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6">
-          <div className="flex flex-col gap-4 rounded-2xl border bg-primary/5 p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-xl font-bold">
-                Welcome back{profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}! 👋
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                You have full access to browse, save and contact vendors directly.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm"><Link to="/search"><SearchIcon className="mr-1.5 h-4 w-4" /> Search</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/saved"><Bookmark className="mr-1.5 h-4 w-4" /> Saved</Link></Button>
-              <Button asChild variant="outline" size="sm"><Link to="/messages"><MessageCircle className="mr-1.5 h-4 w-4" /> Messages</Link></Button>
-            </div>
+          <div className="relative hidden lg:block">
+            <ImigongoPanel className="imigongo-reveal absolute inset-0 h-full w-full" />
           </div>
-        </section>
-      )}
+        </div>
+        <ImigongoBand className="lg:hidden" />
+      </section>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-12 sm:px-6">
-        {/* Categories */}
-        <section className="mb-12">
-          <h2 className="mb-5 text-2xl font-bold">Browse by type</h2>
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-            {CATEGORIES.map((c) => (
-              <Link key={c.value} to="/search" search={{ property: c.value } as never}
-                className="flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center transition hover:border-primary hover:shadow-card">
-                <span className="text-3xl">{c.emoji}</span>
-                <span className="text-sm font-medium">{c.label}</span>
-              </Link>
+        <section className="grid gap-6 border-b pb-10 md:grid-cols-3">
+          {promises.map((p) => (
+            <div key={p.title}>
+              <p.icon className="h-6 w-6 text-primary" />
+              <h2 className="mt-2 text-lg font-bold">{p.title}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{p.body}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-12">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <h2 className="text-3xl font-bold">{t("home.whereTitle")}</h2>
+            <Link
+              to="/neighbourhoods"
+              className="shrink-0 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("home.allAreas")}
+            </Link>
+          </div>
+          <ul className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+            {NEIGHBOURHOODS.slice(0, 6).map((n) => (
+              <li key={n.slug} className="border-t py-3">
+                <Link
+                  to="/neighbourhoods/$slug"
+                  params={{ slug: n.slug }}
+                  className="block hover:text-primary"
+                >
+                  <span className="font-display text-lg font-bold">{n.name}</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground">
+                    {neighbourhoodText(n, i18n.resolvedLanguage).goodFor}
+                  </span>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
-        <section className="mb-12">
-          <div className="mb-5 flex items-end justify-between">
-            <h2 className="text-2xl font-bold">{t("home.featured")}</h2>
-            <Link to="/search" className="text-sm font-medium text-primary hover:underline">View all <ArrowRight className="inline h-3 w-3" /></Link>
-          </div>
-          {featured.isLoading ? <ListingGridSkeleton count={4} /> : (
-            <ListingGrid listings={featured.data ?? []} empty="No featured listings yet." />
-          )}
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-5 text-2xl font-bold">{t("home.latest")}</h2>
-          {latest.isLoading ? <ListingGridSkeleton count={8} /> : (
-            <ListingGrid listings={latest.data ?? []} empty="Be the first to post a listing!" />
-          )}
-        </section>
-
-        {!isVendor && !isAdmin && (
-          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold sm:text-3xl">{t("home.ctaTitle")}</h3>
-                <p className="mt-2 max-w-xl text-white/90">{t("home.ctaSubtitle")}</p>
-              </div>
-              <Button asChild size="lg" variant="secondary" className="rounded-xl">
-                <Link to={isAuthenticated ? "/post-listing" : "/auth"} search={isAuthenticated ? undefined as never : ({ mode: "signup" } as never)}>{t("home.ctaBtn")}</Link>
-              </Button>
-            </div>
+        {features && (
+          <section className="mt-12">
+            <h2 className="mb-5 text-3xl font-bold">{t("home.featured")}</h2>
+            <ListingGrid listings={featured.data ?? []} empty="" />
           </section>
         )}
 
-        {isVendor && !isAdmin && (
-          <section className="rounded-2xl bg-primary p-8 text-primary-foreground sm:p-12">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold sm:text-3xl">Ready to post another listing?</h3>
-                <p className="mt-2 max-w-xl text-white/90">
-                  {(vendor?.free_posts_used ?? 0) < FREE_POST_LIMIT
-                    ? `You have ${FREE_POST_LIMIT - (vendor?.free_posts_used ?? 0)} free post(s) remaining.`
-                    : "You've used your free posts. Upgrade for unlimited listings."}
-                </p>
-              </div>
-              <Button asChild size="lg" variant="secondary" className="rounded-xl">
-                <Link to="/post-listing">Post a listing</Link>
-              </Button>
-            </div>
-          </section>
-        )}
+        <section className="mt-12">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <h2 className="text-3xl font-bold">{t("home.latest")}</h2>
+            <Link
+              to="/search"
+              className="shrink-0 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("home.viewAll")}
+            </Link>
+          </div>
+          {latest.isLoading ? (
+            <ListingGridSkeleton count={8} />
+          ) : (
+            <ListingGrid listings={latest.data ?? []} empty={t("home.noListings")} />
+          )}
+        </section>
+
+        <section className="mt-14 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-2">
+          <div className="bg-primary p-8 text-primary-foreground">
+            <Building2 className="h-7 w-7" />
+            <h2 className="mt-3 text-2xl font-bold">{t("home.apartmentsTitle")}</h2>
+            <p className="mt-2 text-white/85">{t("home.apartmentsBody")}</p>
+            <Button asChild variant="secondary" className="mt-5">
+              <Link to="/for-apartments">{t("home.apartmentsCta")}</Link>
+            </Button>
+          </div>
+          <div className="bg-card p-8">
+            <Globe2 className="h-7 w-7 text-primary" />
+            <h2 className="mt-3 text-2xl font-bold">{t("home.movingTitle")}</h2>
+            <p className="mt-2 text-muted-foreground">{t("home.movingBody")}</p>
+            <Button asChild variant="outline" className="mt-5">
+              <Link to="/guide">{t("home.movingCta")}</Link>
+            </Button>
+          </div>
+        </section>
       </main>
-
       <Footer />
     </div>
   );

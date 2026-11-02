@@ -4,5 +4,7 @@ Disallow: /admin
 Disallow: /dashboard
 Disallow: /messages
 Disallow: /saved
+Disallow: /viewings
+Disallow: /profile
 
-Sitemap: https://home-link-rw.lovable.app/sitemap.xml
+Sitemap: https://homelink.rw/sitemap.xml

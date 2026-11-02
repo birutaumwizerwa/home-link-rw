@@ -1,301 +1,433 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, BadgeCheck } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
+import { useTranslation } from "react-i18next";
+import { BadgeCheck, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
+import { ViewingList } from "@/components/booking/ViewingList";
+import { BuildingsTab } from "@/components/dashboard/BuildingsTab";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { FREE_POST_LIMIT, MOMO_PAYMENT_NUMBER, PLANS, SUPPORT_WHATSAPP } from "@/lib/constants";
+import { formatDate, formatPrice } from "@/lib/format";
 import { fetchListings } from "@/lib/listings-query";
-import { formatPrice } from "@/lib/format";
-import { FREE_POST_LIMIT, PLANS, MOMO_PAYMENT_NUMBER, SUPPORT_WHATSAPP } from "@/lib/constants";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Vendor dashboard" }] }),
+  head: () => ({ meta: [{ title: "Dashboard | HomeLink Rwanda" }] }),
   component: DashboardPage,
 });
 
-// Vendor Profile Form Component (inline to avoid missing import)
-function VendorProfileForm({ vendor, profile, userId, onSave }: { 
-  vendor: any; 
-  profile: { full_name: string; phone: string | null } | null; 
-  userId: string; 
-  onSave: () => void;
-}) {
-  const [fullName, setFullName] = useState(profile?.full_name || "");
-  const [phone, setPhone] = useState(profile?.phone || "");
-  const [businessName, setBusinessName] = useState(vendor?.business_name || "");
-  const [whatsappNumber, setWhatsappNumber] = useState(vendor?.whatsapp_number || "");
-  const [isSaving, setIsSaving] = useState(false);
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-card p-4">
+      <div className="font-display text-3xl font-bold">{value.toLocaleString()}</div>
+      <div className="text-sm text-muted-foreground">{label}</div>
+    </div>
+  );
+}
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await Promise.all([
-        supabase.from("profiles").update({ full_name: fullName, phone: phone || null }).eq("id", userId),
-        supabase.from("vendors").update({ business_name: businessName || null, whatsapp_number: whatsappNumber || null }).eq("id", userId),
-      ]);
-      toast.success("Profile updated");
-      onSave();
-    } catch {
-      toast.error("Failed to update");
-    } finally {
-      setIsSaving(false);
+function BusinessProfile() {
+  const { t } = useTranslation();
+  const { user, profile, refresh } = useAuth();
+  const { data: vendor, refetch } = useQuery({
+    queryKey: ["vendor", user?.id, "profile"],
+    enabled: !!user,
+    queryFn: async () =>
+      (
+        await supabase
+          .from("vendors")
+          .select("business_name, whatsapp_number, bio, languages, vendor_type")
+          .eq("id", user!.id)
+          .maybeSingle()
+      ).data,
+  });
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    business_name: "",
+    whatsapp_number: "",
+    bio: "",
+    languages: "",
+    vendor_type: "individual",
+  });
+  useEffect(() => {
+    setForm({
+      full_name: profile?.full_name ?? "",
+      phone: profile?.phone ?? "",
+      business_name: vendor?.business_name ?? "",
+      whatsapp_number: vendor?.whatsapp_number ?? "",
+      bio: vendor?.bio ?? "",
+      languages: (vendor?.languages ?? []).join(", "),
+      vendor_type: vendor?.vendor_type ?? "individual",
+    });
+  }, [profile, vendor]);
+  const set =
+    (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm({ ...form, [k]: e.target.value });
+
+  const save = async () => {
+    const [a, b] = await Promise.all([
+      supabase
+        .from("profiles")
+        .update({ full_name: form.full_name, phone: form.phone || null })
+        .eq("id", user!.id),
+      supabase
+        .from("vendors")
+        .update({
+          business_name: form.business_name || null,
+          whatsapp_number: form.whatsapp_number || null,
+          bio: form.bio || null,
+          languages: form.languages
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean),
+          vendor_type: form.vendor_type,
+        })
+        .eq("id", user!.id),
+    ]);
+    if (a.error || b.error) {
+      toast.error((a.error ?? b.error)!.message);
+      return;
     }
+    toast.success(t("form.saved"));
+    refetch();
+    refresh();
   };
 
   return (
-    <div className="max-w-lg space-y-4 rounded-xl border bg-card p-6">
-      <h3 className="text-lg font-semibold">Edit your profile</h3>
-      <div>
-        <Label>Full name</Label>
-        <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-3 rounded-lg border bg-card p-5">
+        <div>
+          <Label htmlFor="fn">{t("auth.fullName")}</Label>
+          <Input id="fn" value={form.full_name} onChange={set("full_name")} />
+        </div>
+        <div>
+          <Label htmlFor="ph">{t("auth.phone")}</Label>
+          <Input id="ph" value={form.phone} onChange={set("phone")} />
+        </div>
+        <div>
+          <Label htmlFor="bn">{t("dash.businessName")}</Label>
+          <Input id="bn" value={form.business_name} onChange={set("business_name")} />
+        </div>
+        <div>
+          <Label>{t("dash.accountType")}</Label>
+          <Select
+            value={form.vendor_type}
+            onValueChange={(v) => setForm({ ...form, vendor_type: v })}
+          >
+            <SelectTrigger aria-label={t("dash.accountType")}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {["individual", "agency", "apartment_operator"].map((x) => (
+                <SelectItem key={x} value={x}>
+                  {t(`vendor.type.${x}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="wa">{t("dash.whatsapp")}</Label>
+          <Input id="wa" value={form.whatsapp_number} onChange={set("whatsapp_number")} />
+          <p className="mt-1 text-sm text-muted-foreground">{t("dash.whatsappHint")}</p>
+        </div>
+        <div>
+          <Label htmlFor="lang">{t("dash.languages")}</Label>
+          <Input
+            id="lang"
+            placeholder="Kinyarwanda, English, Français"
+            value={form.languages}
+            onChange={set("languages")}
+          />
+        </div>
+        <div>
+          <Label htmlFor="bio">{t("dash.bio")}</Label>
+          <Textarea id="bio" rows={3} maxLength={600} value={form.bio} onChange={set("bio")} />
+        </div>
+        <Button onClick={save}>{t("form.saveChanges")}</Button>
       </div>
-      <div>
-        <Label>Phone number</Label>
-        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXXXXXXX" />
-      </div>
-      <div>
-        <Label>Business / Agency name (optional)</Label>
-        <Input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Kigali Properties Ltd" />
-      </div>
-      <div>
-        <Label>WhatsApp number *</Label>
-        <Input value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="07XXXXXXXX" />
-        <p className="mt-1 text-xs text-muted-foreground">This is shown to clients on your listings</p>
-      </div>
-      <Button onClick={handleSave} disabled={isSaving}>{isSaving ? "Saving..." : "Save changes"}</Button>
     </div>
   );
 }
 
 function DashboardPage() {
+  const { t, i18n } = useTranslation();
   const { user, isVendor } = useAuth();
   const qc = useQueryClient();
 
   const { data: vendor } = useQuery({
-    queryKey: ["vendor", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase.from("vendors").select("*").eq("id", user!.id).maybeSingle();
-      return data;
-    },
+    queryKey: ["vendor", user?.id, "plan"],
+    enabled: !!user && isVendor,
+    queryFn: async () =>
+      (
+        await supabase
+          .from("vendors")
+          .select(
+            "is_verified, free_posts_used, subscription_status, subscription_expires_at, whatsapp_number",
+          )
+          .eq("id", user!.id)
+          .maybeSingle()
+      ).data,
   });
-
-  const { data: profile, refetch: refetchProfile } = useQuery({
-    queryKey: ["dashboard-profile", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("full_name, phone").eq("id", user!.id).maybeSingle();
-      return data as { full_name: string; phone: string | null } | null;
-    },
-  });
-
-  const { data: listings, refetch } = useQuery({
+  const { data: listings, isLoading } = useQuery({
     queryKey: ["my-listings", user?.id],
-    enabled: !!user,
+    enabled: !!user && isVendor,
     queryFn: () => fetchListings({ vendorId: user!.id, onlyApproved: false }),
+  });
+  const { data: pendingViewings } = useQuery({
+    queryKey: ["viewings", "pending-count", user?.id],
+    enabled: !!user && isVendor,
+    queryFn: async () =>
+      (
+        await supabase
+          .from("viewing_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("vendor_id", user!.id)
+          .eq("status", "pending")
+      ).count ?? 0,
   });
 
   if (!isVendor) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col pb-16 md:pb-0">
         <Navbar />
-        <main className="mx-auto max-w-2xl flex-1 p-8 text-center">
-          <h1 className="text-2xl font-bold">Vendor account needed</h1>
-          <p className="mt-2 text-muted-foreground">Sign up as a vendor to post listings.</p>
+        <main className="mx-auto max-w-xl flex-1 p-8 text-center">
+          <h1 className="text-2xl font-bold">{t("post.listTitle")}</h1>
+          <Button asChild className="mt-4">
+            <Link to="/post-listing">{t("post.becomeVendor")}</Link>
+          </Button>
         </main>
       </div>
     );
   }
 
+  const all = listings ?? [];
   const free = vendor?.subscription_status === "free";
   const used = vendor?.free_posts_used ?? 0;
-  const sub = vendor?.subscription_status ?? "free";
-  const isNewVendor = (listings?.length ?? 0) === 0 && !vendor?.is_verified;
+  const live = all.filter((l) => l.is_approved && l.is_available).length;
+  const pending = all.filter((l) => !l.is_approved).length;
+  const views = all.reduce((s, l) => s + (l.views_count ?? 0), 0);
 
-  const onboardingSteps = [
-    { step: "1", title: "Post your first listing", desc: "You have 3 free posts. Add photos, price and location.", to: "/post-listing" as const, done: (listings?.length ?? 0) > 0 },
-    { step: "2", title: "Add your WhatsApp", desc: "Clients need your number to contact you directly.", to: "/profile" as const, done: !!vendor?.whatsapp_number },
-    { step: "3", title: "Get verified", desc: "Verified vendors get 3× more views and a trust badge.", to: null, done: vendor?.is_verified ?? false },
-  ];
+  const toggleAvailable = async (id: string, value: boolean) => {
+    const { error } = await supabase.from("listings").update({ is_available: value }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["my-listings"] });
+  };
+  const remove = async (id: string) => {
+    if (!confirm(t("dash.confirmDelete"))) return;
+    const { error } = await supabase.from("listings").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("dash.deleted"));
+    qc.invalidateQueries({ queryKey: ["my-listings"] });
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
       <Navbar />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold">Vendor dashboard</h1>
-          <Button asChild><Link to="/post-listing"><Plus className="mr-1.5 h-4 w-4" /> New listing</Link></Button>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold">{t("nav.dashboard")}</h1>
+          <Button asChild>
+            <Link to="/post-listing">
+              <Plus className="h-4 w-4" /> {t("dash.newListing")}
+            </Link>
+          </Button>
         </div>
 
-        {isNewVendor && (
-          <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-6">
-            <h2 className="text-xl font-bold">Welcome to HomeLink Rwanda! 🎉</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Your vendor account is active. Here's how to get started and attract your first tenants.
-            </p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {onboardingSteps.map((s) => (
-                <div key={s.step} className="rounded-xl border bg-card p-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`grid h-7 w-7 place-items-center rounded-full text-sm font-bold ${s.done ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                      {s.done ? "✓" : s.step}
-                    </span>
-                    <span className="font-semibold">{s.title}</span>
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">{s.desc}</p>
-                  {s.to && !s.done && (
-                    <Button asChild size="sm" variant="outline" className="mt-3"><Link to={s.to}>Go</Link></Button>
-                  )}
-                  {s.done && <span className="mt-3 inline-block text-xs font-medium text-primary">✓ Done</span>}
-                </div>
-              ))}
-            </div>
+        <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border lg:grid-cols-4">
+          <Stat label={t("dash.live")} value={live} />
+          <Stat label={t("dash.inReview")} value={pending} />
+          <Stat label={t("dash.views")} value={views} />
+          <Stat label={t("dash.viewingRequests")} value={pendingViewings ?? 0} />
+        </div>
+
+        {!isLoading && (all.length === 0 || !vendor?.whatsapp_number) && (
+          <div className="mt-6 rounded-lg border bg-card p-5">
+            <h2 className="text-lg font-bold">{t("dash.startTitle")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+              {!vendor?.whatsapp_number && <li>{t("dash.startWhatsapp")}</li>}
+              {all.length === 0 && <li>{t("dash.startListing", { count: FREE_POST_LIMIT })}</li>}
+            </ul>
           </div>
         )}
 
-        <div className="mt-6 rounded-xl border bg-card p-5">
-          {free ? (
-            <>
-              <div className="mb-2 flex justify-between text-sm">
-                <span className="font-medium">Free plan</span>
-                <span className="text-muted-foreground">{used} of {FREE_POST_LIMIT} free posts used</span>
-              </div>
-              <Progress value={(used / FREE_POST_LIMIT) * 100} />
-              {used >= FREE_POST_LIMIT && (
-                <div className="mt-4 rounded-md bg-warning/10 p-3 text-sm">
-                  You've used your free posts. <strong>Upgrade</strong> to keep posting.
-                </div>
-              )}
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {Object.entries(PLANS).map(([key, p]) => (
-                  <div key={key} className="rounded-lg border p-4">
-                    <div className="flex items-baseline justify-between">
-                      <h3 className="font-semibold">{p.name}</h3>
-                      <span className="text-lg font-bold text-primary">{formatPrice(p.price_rwf)}<span className="text-xs text-muted-foreground">/30 days</span></span>
-                    </div>
-                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground">{p.features.map((f) => <li key={f}>• {f}</li>)}</ul>
-                    <Button asChild variant="outline" size="sm" className="mt-3 w-full">
-                      <a href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`Activate ${p.name} plan. My vendor ID: ${user?.id}`)}`} target="_blank" rel="noreferrer">
-                        Pay {formatPrice(p.price_rwf)} via MoMo
-                      </a>
-                    </Button>
-                    <p className="mt-2 text-xs text-muted-foreground">Send to MoMo: <strong>{MOMO_PAYMENT_NUMBER}</strong>, reference: <code>{user?.id?.slice(0, 8)}</code></p>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center justify-between">
-              <div>
-                <Badge>{sub.toUpperCase()} plan</Badge>
-                <div className="mt-1 text-sm text-muted-foreground">Expires {vendor?.subscription_expires_at ? new Date(vendor.subscription_expires_at).toLocaleDateString() : "—"}</div>
-              </div>
-            </div>
-          )}
-        </div>
-
         <Tabs defaultValue="listings" className="mt-8">
-          <TabsList>
-            <TabsTrigger value="listings">My listings</TabsTrigger>
-            <TabsTrigger value="profile">My profile</TabsTrigger>
+          <TabsList className="flex h-auto w-full flex-wrap justify-start">
+            <TabsTrigger value="listings">{t("dash.tabListings")}</TabsTrigger>
+            <TabsTrigger value="buildings">{t("dash.tabBuildings")}</TabsTrigger>
+            <TabsTrigger value="viewings">{t("dash.tabViewings")}</TabsTrigger>
+            <TabsTrigger value="plan">{t("dash.tabPlan")}</TabsTrigger>
+            <TabsTrigger value="profile">{t("dash.tabProfile")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="listings">
-            {!listings || listings.length === 0 ? (
-              <div className="rounded-xl border bg-muted/30 p-10 text-center text-muted-foreground">No listings yet. Click "New listing" to start.</div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border bg-card">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-                    <tr><th className="p-3">Title</th><th className="p-3">Type</th><th className="p-3">Price</th><th className="p-3">Status</th><th className="p-3"></th></tr>
-                  </thead>
-                  <tbody>
-                    {(listings as unknown as Array<{ id: string; title: string; listing_type: string; price: number; }>).map((l) => (
-                      <tr key={l.id} className="border-t">
-                        <td className="p-3 font-medium">{l.title}</td>
-                        <td className="p-3 capitalize">{l.listing_type}</td>
-                        <td className="p-3">{formatPrice(l.price)}</td>
-                        <td className="p-3">
-                          <StatusBadge id={l.id} onChange={() => refetch()} />
-                        </td>
-                        <td className="p-3 text-right">
-                          <Button asChild size="sm" variant="ghost"><Link to="/listing/$id" params={{ id: l.id }}>View</Link></Button>
-                          <Button size="sm" variant="ghost" onClick={async () => {
-                            if (!confirm("Delete this listing?")) return;
-                            await supabase.from("listings").delete().eq("id", l.id);
-                            toast.success("Deleted");
-                            qc.invalidateQueries({ queryKey: ["my-listings"] });
-                          }}><Trash2 className="h-4 w-4" /></Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {all.length === 0 ? (
+              <div className="rounded-lg border border-dashed bg-card p-10 text-center text-muted-foreground">
+                {t("dash.noListings")}
               </div>
+            ) : (
+              <ul className="divide-y rounded-lg border bg-card">
+                {all.map((l) => (
+                  <li key={l.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center">
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        to="/listing/$id"
+                        params={{ id: l.id }}
+                        className="font-semibold hover:text-primary"
+                      >
+                        {l.title}
+                        {l.unit_label ? `, ${l.unit_label}` : ""}
+                      </Link>
+                      <p className="text-sm text-muted-foreground">
+                        {formatPrice(l.price)},{" "}
+                        {l.is_approved ? t("dash.statusApproved") : t("dash.statusReview")},{" "}
+                        {t("dash.viewCount", { count: l.views_count ?? 0 })}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toggleAvailable(l.id, !l.is_available)}
+                      >
+                        {l.is_available ? t("dash.markTaken") : t("dash.markVacant")}
+                      </Button>
+                      <Button asChild size="icon" variant="ghost" aria-label={t("dash.view")}>
+                        <Link to="/listing/$id" params={{ id: l.id }}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild size="icon" variant="ghost" aria-label={t("dash.edit")}>
+                        <Link to="/edit-listing/$id" params={{ id: l.id }}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild size="icon" variant="ghost" aria-label={t("dash.duplicate")}>
+                        <Link to="/post-listing" search={{ duplicate: l.id }}>
+                          <Copy className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={t("common.delete")}
+                        onClick={() => remove(l.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </TabsContent>
-
-          <TabsContent value="profile" className="space-y-6">
-            {user && (
-              <VendorProfileForm
-                vendor={vendor ?? null}
-                profile={profile ?? null}
-                userId={user.id}
-                onSave={() => refetchProfile()}
-              />
-            )}
-            {!vendor?.is_verified && (
-              <div className="max-w-lg rounded-xl border border-primary/30 bg-primary/5 p-5">
-                <h3 className="flex items-center gap-2 font-semibold"><BadgeCheck className="h-5 w-5 text-primary" /> Get verified</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Verified vendors get more trust, more clicks, and a verified badge on all listings.
-                  Send your National ID to our WhatsApp to get verified for free.
+          <TabsContent value="buildings">
+            <BuildingsTab listings={all} />
+          </TabsContent>
+          <TabsContent value="viewings">
+            <ViewingList as="vendor" />
+          </TabsContent>
+          <TabsContent value="plan">
+            <div className="rounded-lg border bg-card p-5">
+              {free ? (
+                <>
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="font-semibold">{t("dash.freePlan")}</span>
+                    <span className="text-muted-foreground">
+                      {t("dash.postsUsed", { used, total: FREE_POST_LIMIT })}
+                    </span>
+                  </div>
+                  <Progress value={(used / FREE_POST_LIMIT) * 100} />
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {Object.entries(PLANS).map(([key, p]) => (
+                      <div key={key} className="rounded-lg border p-4">
+                        <div className="flex items-baseline justify-between">
+                          <h3 className="text-lg font-bold">{p.name}</h3>
+                          <span className="font-bold">
+                            {formatPrice(p.price_rwf)}
+                            <span className="text-sm font-normal text-muted-foreground">
+                              {" "}
+                              {t("dash.per30")}
+                            </span>
+                          </span>
+                        </div>
+                        <ul className="mt-2 list-disc pl-5 text-sm text-muted-foreground">
+                          <li>{key === "basic" ? t("dash.planBasic") : t("dash.planPro")}</li>
+                        </ul>
+                        <Button asChild variant="outline" size="sm" className="mt-3 w-full">
+                          <a
+                            href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`Activate ${p.name} plan. My vendor ID: ${user?.id}`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {t("dash.activate", { plan: p.name })}
+                          </a>
+                        </Button>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {t("dash.momo", {
+                            number: MOMO_PAYMENT_NUMBER,
+                            reference: user?.id?.slice(0, 8),
+                          })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p>
+                  <span className="font-semibold capitalize">{vendor?.subscription_status}</span>
+                  {vendor?.subscription_expires_at
+                    ? `, ${t("dash.expires", { date: formatDate(vendor.subscription_expires_at, i18n.resolvedLanguage) })}`
+                    : ""}
                 </p>
+              )}
+            </div>
+            {!vendor?.is_verified && (
+              <div className="mt-4 rounded-lg border bg-card p-5">
+                <h3 className="flex items-center gap-2 text-lg font-bold">
+                  <BadgeCheck className="h-5 w-5 text-primary" /> {t("dash.verifyTitle")}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">{t("dash.verifyBody")}</p>
                 <Button asChild variant="outline" className="mt-3">
-                  <a href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`I would like to request verification. My vendor ID: ${user?.id}`)}`} target="_blank" rel="noreferrer">
-                    Request verification via WhatsApp
+                  <a
+                    href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent(`I would like to request verification. My vendor ID: ${user?.id}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t("dash.verifyCta")}
                   </a>
                 </Button>
               </div>
             )}
           </TabsContent>
+          <TabsContent value="profile">
+            <BusinessProfile />
+          </TabsContent>
         </Tabs>
       </main>
       <Footer />
-    </div>
-  );
-}
-
-function StatusBadge({ id, onChange }: { id: string; onChange: () => void }) {
-  const { data: l } = useQuery({
-    queryKey: ["listing-status", id],
-    queryFn: async () => {
-      const { data } = await supabase.from("listings").select("is_approved,is_available").eq("id", id).maybeSingle();
-      return data;
-    },
-  });
-  if (!l) return null;
-  return (
-    <div className="flex flex-wrap gap-1">
-      {l.is_approved ? <Badge variant="secondary">Approved</Badge> : <Badge variant="outline">Pending</Badge>}
-      <button
-        className="text-xs underline text-muted-foreground hover:text-foreground"
-        onClick={async () => {
-          await supabase.from("listings").update({ is_available: !l.is_available }).eq("id", id);
-          onChange();
-        }}
-      >
-        {l.is_available ? "Mark unavailable" : "Mark available"}
-      </button>
     </div>
   );
 }

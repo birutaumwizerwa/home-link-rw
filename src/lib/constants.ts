@@ -1,14 +1,39 @@
 export const DISTRICTS = [
   // Kigali
-  "Gasabo", "Kicukiro", "Nyarugenge",
+  "Gasabo",
+  "Kicukiro",
+  "Nyarugenge",
   // Eastern
-  "Bugesera", "Gatsibo", "Kayonza", "Kirehe", "Ngoma", "Nyagatare", "Rwamagana",
+  "Bugesera",
+  "Gatsibo",
+  "Kayonza",
+  "Kirehe",
+  "Ngoma",
+  "Nyagatare",
+  "Rwamagana",
   // Northern
-  "Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo",
+  "Burera",
+  "Gakenke",
+  "Gicumbi",
+  "Musanze",
+  "Rulindo",
   // Southern
-  "Gisagara", "Huye", "Kamonyi", "Muhanga", "Nyamagabe", "Nyanza", "Nyaruguru", "Ruhango",
+  "Gisagara",
+  "Huye",
+  "Kamonyi",
+  "Muhanga",
+  "Nyamagabe",
+  "Nyanza",
+  "Nyaruguru",
+  "Ruhango",
   // Western
-  "Karongi", "Ngororero", "Nyabihu", "Nyamasheke", "Rubavu", "Rutsiro", "Rusizi",
+  "Karongi",
+  "Ngororero",
+  "Nyabihu",
+  "Nyamasheke",
+  "Rubavu",
+  "Rutsiro",
+  "Rusizi",
 ] as const;
 
 export const PROPERTY_TYPES = [
@@ -52,9 +77,30 @@ export const AMENITIES = [
   { key: "has_parking", label: "Parking" },
   { key: "has_wifi", label: "WiFi" },
   { key: "has_water", label: "Water 24/7" },
+  { key: "has_hot_water", label: "Hot water" },
   { key: "has_generator", label: "Generator" },
   { key: "has_balcony", label: "Balcony" },
+  { key: "has_ac", label: "Air conditioning" },
+  { key: "has_laundry", label: "Laundry" },
+  { key: "has_workspace", label: "Workspace" },
+  { key: "has_housekeeping", label: "Housekeeping" },
+  { key: "has_elevator", label: "Elevator" },
+  { key: "has_gym", label: "Gym" },
+  { key: "has_pool", label: "Pool" },
+  { key: "pets_allowed", label: "Pets allowed" },
 ] as const;
+
+export const CURRENCIES = ["RWF", "USD", "EUR", "GBP"] as const;
+export type Currency = (typeof CURRENCIES)[number];
+
+export const STAY_OPTIONS = [
+  { value: "short", maxMinStay: 3 },
+  { value: "medium", maxMinStay: 12 },
+  { value: "long", maxMinStay: null },
+] as const;
+
+export const SITE_URL =
+  (import.meta.env.VITE_APP_URL as string | undefined) ?? "https://homelink.rw";
 
 export const PLANS = {
   basic: {

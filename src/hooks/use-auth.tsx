@@ -37,10 +37,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadAux = React.useCallback(async (userId: string) => {
     const [{ data: p }, { data: r }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+      supabase.rpc("get_my_profile"),
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
-    setProfile(p as Profile | null);
+    setProfile(((p as Profile[] | null) ?? [])[0] ?? null);
     setRoles(((r as { role: AppRole }[] | null) ?? []).map((x) => x.role));
   }, []);
 
@@ -51,7 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(s?.user ?? null);
       if (s?.user) {
         // defer to avoid deadlock
-        setTimeout(() => { void loadAux(s.user.id); }, 0);
+        setTimeout(() => {
+          void loadAux(s.user.id);
+        }, 0);
       } else {
         setProfile(null);
         setRoles([]);
@@ -77,8 +79,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
     isVendor: roles.includes("vendor"),
     isAdmin: roles.includes("admin"),
-    signOut: async () => { await supabase.auth.signOut(); },
-    refresh: async () => { if (user) await loadAux(user.id); },
+    signOut: async () => {
+      await supabase.auth.signOut();
+    },
+    refresh: async () => {
+      if (user) await loadAux(user.id);
+    },
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

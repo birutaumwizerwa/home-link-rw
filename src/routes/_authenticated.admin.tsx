@@ -35,11 +35,11 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminPage() {
   const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (!loading && !isAdmin) navigate({ to: "/" });
   }, [loading, isAdmin, navigate]);
-  
+
   if (!isAdmin) return null;
 
   return (
@@ -60,7 +60,7 @@ function AdminPage() {
               Manage listings, vendors, users, and platform settings
             </p>
           </div>
-          
+
           {/* View Site Button - Option to see the live website */}
           <Button variant="outline" asChild className="gap-2">
             <Link to="/">
@@ -73,7 +73,7 @@ function AdminPage() {
 
         {/* Stats Grid */}
         <StatsGrid />
-        
+
         {/* Main Tabs */}
         <Tabs defaultValue="overview" className="mt-8">
           <TabsList className="flex flex-wrap h-auto gap-1">
@@ -95,14 +95,32 @@ function AdminPage() {
             <TabsTrigger value="subscriptions">
               <DollarSign className="h-4 w-4 mr-1.5" /> Subscriptions
             </TabsTrigger>
+            <TabsTrigger value="rates">
+              <DollarSign className="h-4 w-4 mr-1.5" /> Exchange rates
+            </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="overview"><OverviewTab /></TabsContent>
-          <TabsContent value="pending"><PendingListings /></TabsContent>
-          <TabsContent value="vendors"><VendorsList /></TabsContent>
-          <TabsContent value="reports"><ReportsList /></TabsContent>
-          <TabsContent value="users"><UsersList /></TabsContent>
-          <TabsContent value="subscriptions"><SubscriptionsList /></TabsContent>
+
+          <TabsContent value="overview">
+            <OverviewTab />
+          </TabsContent>
+          <TabsContent value="pending">
+            <PendingListings />
+          </TabsContent>
+          <TabsContent value="vendors">
+            <VendorsList />
+          </TabsContent>
+          <TabsContent value="reports">
+            <ReportsList />
+          </TabsContent>
+          <TabsContent value="users">
+            <UsersList />
+          </TabsContent>
+          <TabsContent value="subscriptions">
+            <SubscriptionsList />
+          </TabsContent>
+          <TabsContent value="rates">
+            <ExchangeRates />
+          </TabsContent>
         </Tabs>
       </main>
       <Footer />
@@ -141,9 +159,18 @@ function useAdminStats() {
         supabase.from("listings").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("vendors").select("id", { count: "exact", head: true }),
-        supabase.from("listings").select("id", { count: "exact", head: true }).eq("is_approved", false),
-        supabase.from("reports").select("id", { count: "exact", head: true }).eq("is_resolved", false),
-        supabase.from("subscriptions").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase
+          .from("listings")
+          .select("id", { count: "exact", head: true })
+          .eq("is_approved", false),
+        supabase
+          .from("reports")
+          .select("id", { count: "exact", head: true })
+          .eq("is_resolved", false),
+        supabase
+          .from("subscriptions")
+          .select("id", { count: "exact", head: true })
+          .eq("is_active", true),
         supabase.from("subscriptions").select("price_rwf").eq("is_active", true),
       ]);
 
@@ -166,14 +193,72 @@ function StatsGrid() {
   const { data: s, isLoading } = useAdminStats();
 
   const stats = [
-    { label: "Total Listings", value: s?.listings ?? 0, icon: Home, color: "bg-blue-500", bgColor: "bg-blue-50 dark:bg-blue-950/30", textColor: "text-blue-600" },
-    { label: "Total Users", value: s?.users ?? 0, icon: UsersIcon, color: "bg-green-500", bgColor: "bg-green-50 dark:bg-green-950/30", textColor: "text-green-600" },
-    { label: "Vendors", value: s?.vendors ?? 0, icon: Building2, color: "bg-purple-500", bgColor: "bg-purple-50 dark:bg-purple-950/30", textColor: "text-purple-600" },
-    { label: "Pending Approval", value: s?.pending ?? 0, icon: Clock, color: "bg-yellow-500", bgColor: "bg-yellow-50 dark:bg-yellow-950/30", textColor: "text-yellow-600", alert: (s?.pending ?? 0) > 0 },
-    { label: "Open Reports", value: s?.reports ?? 0, icon: AlertTriangle, color: "bg-red-500", bgColor: "bg-red-50 dark:bg-red-950/30", textColor: "text-red-600", alert: (s?.reports ?? 0) > 0 },
-    { label: "Active Subs", value: s?.activeSubs ?? 0, icon: DollarSign, color: "bg-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-950/30", textColor: "text-emerald-600" },
-    { label: "Revenue (MTD)", value: `${(s?.totalRevenue ?? 0).toLocaleString()} RWF`, icon: TrendingUp, color: "bg-amber-500", bgColor: "bg-amber-50 dark:bg-amber-950/30", textColor: "text-amber-600" },
-    { label: "Engagement", value: `${s?.users ? Math.round(((s?.listings ?? 0) / (s?.users ?? 1)) * 10) / 10 : 0} listings/user`, icon: MessageCircle, color: "bg-indigo-500", bgColor: "bg-indigo-50 dark:bg-indigo-950/30", textColor: "text-indigo-600" },
+    {
+      label: "Total Listings",
+      value: s?.listings ?? 0,
+      icon: Home,
+      color: "bg-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
+      textColor: "text-blue-600",
+    },
+    {
+      label: "Total Users",
+      value: s?.users ?? 0,
+      icon: UsersIcon,
+      color: "bg-green-500",
+      bgColor: "bg-green-50 dark:bg-green-950/30",
+      textColor: "text-green-600",
+    },
+    {
+      label: "Vendors",
+      value: s?.vendors ?? 0,
+      icon: Building2,
+      color: "bg-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950/30",
+      textColor: "text-purple-600",
+    },
+    {
+      label: "Pending Approval",
+      value: s?.pending ?? 0,
+      icon: Clock,
+      color: "bg-yellow-500",
+      bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
+      textColor: "text-yellow-600",
+      alert: (s?.pending ?? 0) > 0,
+    },
+    {
+      label: "Open Reports",
+      value: s?.reports ?? 0,
+      icon: AlertTriangle,
+      color: "bg-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/30",
+      textColor: "text-red-600",
+      alert: (s?.reports ?? 0) > 0,
+    },
+    {
+      label: "Active Subs",
+      value: s?.activeSubs ?? 0,
+      icon: DollarSign,
+      color: "bg-emerald-500",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+      textColor: "text-emerald-600",
+    },
+    {
+      label: "Revenue (MTD)",
+      value: `${(s?.totalRevenue ?? 0).toLocaleString()} RWF`,
+      icon: TrendingUp,
+      color: "bg-amber-500",
+      bgColor: "bg-amber-50 dark:bg-amber-950/30",
+      textColor: "text-amber-600",
+    },
+    {
+      label: "Engagement",
+      value: `${s?.users ? Math.round(((s?.listings ?? 0) / (s?.users ?? 1)) * 10) / 10 : 0} listings/user`,
+      icon: MessageCircle,
+      color: "bg-indigo-500",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
+      textColor: "text-indigo-600",
+    },
   ];
 
   if (isLoading) {
@@ -252,11 +337,7 @@ function OverviewTab() {
   const { data: recentUsers } = useQuery<RecentUser[]>({
     queryKey: ["admin", "recent-users"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, full_name, phone, location, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5);
+      const { data } = await supabase.rpc("admin_list_profiles").limit(5);
       return (data ?? []) as RecentUser[];
     },
   });
@@ -266,7 +347,9 @@ function OverviewTab() {
     queryFn: async () => {
       const { data } = await supabase
         .from("vendors")
-        .select("id, business_name, is_verified, subscription_status, profile:profiles!vendors_id_fkey(full_name)")
+        .select(
+          "id, business_name, is_verified, subscription_status, profile:profiles!vendors_id_fkey(full_name)",
+        )
         .order("created_at", { ascending: false })
         .limit(5);
       return (data ?? []) as unknown as RecentVendor[];
@@ -298,9 +381,14 @@ function OverviewTab() {
               <div key={l.id} className="flex items-center justify-between p-4">
                 <div>
                   <p className="font-medium text-sm">{l.title}</p>
-                  <p className="text-xs text-muted-foreground">{l.district} • {l.price?.toLocaleString()} RWF • {l.views_count || 0} views</p>
+                  <p className="text-xs text-muted-foreground">
+                    {l.district} • {l.price?.toLocaleString()} RWF • {l.views_count || 0} views
+                  </p>
                 </div>
-                <Badge variant={l.is_approved ? "default" : "outline"} className={l.is_approved ? "bg-green-100 text-green-700" : "text-yellow-600"}>
+                <Badge
+                  variant={l.is_approved ? "default" : "outline"}
+                  className={l.is_approved ? "bg-green-100 text-green-700" : "text-yellow-600"}
+                >
                   {l.is_approved ? "Approved" : "Pending"}
                 </Badge>
               </div>
@@ -324,7 +412,9 @@ function OverviewTab() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-sm">{u.full_name || "Anonymous"}</p>
-                  <p className="text-xs text-muted-foreground">{u.phone || "No phone"} • {u.location || "No location"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {u.phone || "No phone"} • {u.location || "No location"}
+                  </p>
                 </div>
                 <Badge variant="secondary">{new Date(u.created_at).toLocaleDateString()}</Badge>
               </div>
@@ -397,13 +487,13 @@ function PendingListings() {
       return (data ?? []) as PendingListing[];
     },
   });
-  
+
   const update = async (id: string, patch: { is_approved?: boolean; is_available?: boolean }) => {
     await supabase.from("listings").update(patch).eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "listings"] });
     toast.success("Listing updated");
   };
-  
+
   return (
     <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
       <table className="w-full text-sm">
@@ -426,20 +516,30 @@ function PendingListings() {
                 {l.is_approved ? (
                   <Badge className="bg-green-100 text-green-700">Approved</Badge>
                 ) : (
-                  <Badge variant="outline" className="text-yellow-600">Pending</Badge>
+                  <Badge variant="outline" className="text-yellow-600">
+                    Pending
+                  </Badge>
                 )}
               </td>
               <td className="p-3 text-right space-x-2">
                 {!l.is_approved && (
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => update(l.id, { is_approved: true })}>
+                  <Button
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => update(l.id, { is_approved: true })}
+                  >
                     <CheckCircle className="mr-1 h-3 w-3" /> Approve
                   </Button>
                 )}
-                <Button size="sm" variant="destructive" onClick={async () => {
-                  await supabase.from("listings").delete().eq("id", l.id);
-                  qc.invalidateQueries({ queryKey: ["admin", "listings"] });
-                  toast.success("Deleted");
-                }}>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={async () => {
+                    await supabase.from("listings").delete().eq("id", l.id);
+                    qc.invalidateQueries({ queryKey: ["admin", "listings"] });
+                    toast.success("Deleted");
+                  }}
+                >
                   <XCircle className="mr-1 h-3 w-3" /> Delete
                 </Button>
               </td>
@@ -478,18 +578,20 @@ function VendorsList() {
     queryFn: async () => {
       const { data } = await supabase
         .from("vendors")
-        .select("id,business_name,is_verified,subscription_status,subscription_expires_at,profile:profiles!vendors_id_fkey(full_name)")
+        .select(
+          "id,business_name,is_verified,subscription_status,subscription_expires_at,profile:profiles!vendors_id_fkey(full_name)",
+        )
         .order("created_at", { ascending: false });
       return (data ?? []) as unknown as VendorItem[];
     },
   });
-  
+
   // Helper to check if subscription is expired
   const isExpired = (expiresAt: string | null) => {
     if (!expiresAt) return true;
     return new Date(expiresAt) < new Date();
   };
-  
+
   return (
     <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
       <table className="w-full text-sm">
@@ -505,20 +607,28 @@ function VendorsList() {
         <tbody>
           {(data ?? []).map((vv) => {
             const expired = isExpired(vv.subscription_expires_at);
-            
+
             return (
               <tr key={vv.id} className="border-t hover:bg-muted/30 transition">
-                <td className="p-3 font-medium">{vv.business_name ?? vv.profile?.full_name ?? "—"}</td>
+                <td className="p-3 font-medium">
+                  {vv.business_name ?? vv.profile?.full_name ?? "—"}
+                </td>
                 <td className="p-3">
                   {vv.is_verified ? (
                     <Badge className="bg-green-100 text-green-700">✓ Verified</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-yellow-600">Unverified</Badge>
+                    <Badge variant="outline" className="text-yellow-600">
+                      Unverified
+                    </Badge>
                   )}
                 </td>
                 <td className="p-3">
-                  <span className={`capitalize ${expired && vv.subscription_status !== "free" ? "text-red-500" : ""}`}>
-                    {expired && vv.subscription_status !== "free" ? "Expired" : vv.subscription_status}
+                  <span
+                    className={`capitalize ${expired && vv.subscription_status !== "free" ? "text-red-500" : ""}`}
+                  >
+                    {expired && vv.subscription_status !== "free"
+                      ? "Expired"
+                      : vv.subscription_status}
                   </span>
                 </td>
                 <td className="p-3">
@@ -533,15 +643,15 @@ function VendorsList() {
                 </td>
                 <td className="p-3 text-right space-x-2">
                   {/* Verify/Unverify Button */}
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={async () => {
                       const { error } = await supabase
                         .from("vendors")
                         .update({ is_verified: !vv.is_verified })
                         .eq("id", vv.id);
-                      
+
                       if (error) {
                         toast.error(error.message);
                       } else {
@@ -551,52 +661,50 @@ function VendorsList() {
                       }
                     }}
                   >
-                    <Award className="mr-1 h-3 w-3" /> 
+                    <Award className="mr-1 h-3 w-3" />
                     {vv.is_verified ? "Unverify" : "Verify"}
                   </Button>
-                  
+
                   {/* Activate Basic Plan Button */}
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="secondary"
                     onClick={async () => {
                       // Calculate 30 days from now
                       const expiresAt = new Date();
                       expiresAt.setDate(expiresAt.getDate() + 30);
-                      
+
                       // 1. Update vendors table
                       const { error: vendorError } = await supabase
                         .from("vendors")
-                        .update({ 
-                          subscription_status: "basic", 
-                          subscription_expires_at: expiresAt.toISOString() 
+                        .update({
+                          subscription_status: "basic",
+                          subscription_expires_at: expiresAt.toISOString(),
                         })
                         .eq("id", vv.id);
-                      
+
                       if (vendorError) {
                         toast.error("Failed to update vendor: " + vendorError.message);
                         return;
                       }
-                      
+
                       // 2. Insert into subscriptions table
-                      const { error: subError } = await supabase
-                        .from("subscriptions")
-                        .insert({
-                          vendor_id: vv.id,
-                          plan: "basic",
-                          price_rwf: 5000,
-                          payment_reference: `admin_basic_${Date.now()}`,
-                          expires_at: expiresAt.toISOString(),
-                          is_active: true
-                        });
-                      
+                      const { error: subError } = await supabase.from("subscriptions").insert({
+                        vendor_id: vv.id,
+                        plan: "basic",
+                        price_rwf: 5000,
+                        payment_reference: `admin_basic_${Date.now()}`,
+                        expires_at: expiresAt.toISOString(),
+                        is_active: true,
+                      });
+
                       if (subError) {
                         console.error("Subscription insert error:", subError);
                         toast.error("Vendor updated but subscription record failed");
                       } else {
                         toast.success("Basic plan activated for 30 days!");
                       }
-                      
+
                       qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
                       qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
                       qc.invalidateQueries({ queryKey: ["admin", "stats"] });
@@ -604,49 +712,47 @@ function VendorsList() {
                   >
                     Activate Basic
                   </Button>
-                  
+
                   {/* Activate Pro Plan Button */}
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="bg-purple-600 hover:bg-purple-700 text-white"
                     onClick={async () => {
                       // Calculate 30 days from now
                       const expiresAt = new Date();
                       expiresAt.setDate(expiresAt.getDate() + 30);
-                      
+
                       // 1. Update vendors table
                       const { error: vendorError } = await supabase
                         .from("vendors")
-                        .update({ 
-                          subscription_status: "pro", 
-                          subscription_expires_at: expiresAt.toISOString() 
+                        .update({
+                          subscription_status: "pro",
+                          subscription_expires_at: expiresAt.toISOString(),
                         })
                         .eq("id", vv.id);
-                      
+
                       if (vendorError) {
                         toast.error("Failed to update vendor: " + vendorError.message);
                         return;
                       }
-                      
+
                       // 2. Insert into subscriptions table
-                      const { error: subError } = await supabase
-                        .from("subscriptions")
-                        .insert({
-                          vendor_id: vv.id,
-                          plan: "pro",
-                          price_rwf: 15000,
-                          payment_reference: `admin_pro_${Date.now()}`,
-                          expires_at: expiresAt.toISOString(),
-                          is_active: true
-                        });
-                      
+                      const { error: subError } = await supabase.from("subscriptions").insert({
+                        vendor_id: vv.id,
+                        plan: "pro",
+                        price_rwf: 15000,
+                        payment_reference: `admin_pro_${Date.now()}`,
+                        expires_at: expiresAt.toISOString(),
+                        is_active: true,
+                      });
+
                       if (subError) {
                         console.error("Subscription insert error:", subError);
                         toast.error("Vendor updated but subscription record failed");
                       } else {
                         toast.success("Pro plan activated for 30 days! 🎉");
                       }
-                      
+
                       qc.invalidateQueries({ queryKey: ["admin", "vendors"] });
                       qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
                       qc.invalidateQueries({ queryKey: ["admin", "stats"] });
@@ -696,7 +802,7 @@ function ReportsList() {
       return (data ?? []) as ReportItem[];
     },
   });
-  
+
   return (
     <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
       <table className="w-full text-sm">
@@ -724,11 +830,14 @@ function ReportsList() {
               </td>
               <td className="p-3 text-right">
                 {!r.is_resolved && (
-                  <Button size="sm" onClick={async () => {
-                    await supabase.from("reports").update({ is_resolved: true }).eq("id", r.id);
-                    qc.invalidateQueries({ queryKey: ["admin", "reports"] });
-                    toast.success("Report resolved");
-                  }}>
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      await supabase.from("reports").update({ is_resolved: true }).eq("id", r.id);
+                      qc.invalidateQueries({ queryKey: ["admin", "reports"] });
+                      toast.success("Report resolved");
+                    }}
+                  >
                     <CheckCircle className="mr-1 h-3 w-3" /> Resolve
                   </Button>
                 )}
@@ -759,15 +868,11 @@ function UsersList() {
   const { data } = useQuery<UserItem[]>({
     queryKey: ["admin", "users"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(200);
+      const { data } = await supabase.rpc("admin_list_profiles").limit(200);
       return (data ?? []) as UserItem[];
     },
   });
-  
+
   return (
     <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
       <table className="w-full text-sm">
@@ -794,11 +899,18 @@ function UsersList() {
                 )}
               </td>
               <td className="p-3 text-right">
-                <Button size="sm" variant="outline" onClick={async () => {
-                  await supabase.from("profiles").update({ is_banned: !u.is_banned }).eq("id", u.id);
-                  qc.invalidateQueries({ queryKey: ["admin", "users"] });
-                  toast.success(u.is_banned ? "User unbanned" : "User banned");
-                }}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    await supabase
+                      .from("profiles")
+                      .update({ is_banned: !u.is_banned })
+                      .eq("id", u.id);
+                    qc.invalidateQueries({ queryKey: ["admin", "users"] });
+                    toast.success(u.is_banned ? "User unbanned" : "User banned");
+                  }}
+                >
                   {u.is_banned ? "Unban" : "Ban"}
                 </Button>
               </td>
@@ -832,7 +944,9 @@ function SubscriptionsList() {
     queryFn: async () => {
       const { data } = await supabase
         .from("subscriptions")
-        .select("id, vendor_id, plan, price_rwf, payment_reference, expires_at, is_active, vendor:vendors!subscriptions_vendor_id_fkey(business_name, profile:profiles!vendors_id_fkey(full_name))")
+        .select(
+          "id, vendor_id, plan, price_rwf, payment_reference, expires_at, is_active, vendor:vendors!subscriptions_vendor_id_fkey(business_name, profile:profiles!vendors_id_fkey(full_name))",
+        )
         .order("created_at", { ascending: false });
       return (data ?? []) as unknown as SubscriptionItem[];
     },
@@ -854,14 +968,19 @@ function SubscriptionsList() {
         </thead>
         <tbody>
           {(data ?? []).map((ss) => {
-            const name = ss.vendor?.business_name || ss.vendor?.profile?.full_name || ss.vendor_id.slice(0, 8);
+            const name =
+              ss.vendor?.business_name || ss.vendor?.profile?.full_name || ss.vendor_id.slice(0, 8);
             return (
               <tr key={ss.id} className="border-t hover:bg-muted/30 transition">
                 <td className="p-3 font-medium">{name}</td>
-                <td className="p-3"><span className="capitalize">{ss.plan}</span></td>
+                <td className="p-3">
+                  <span className="capitalize">{ss.plan}</span>
+                </td>
                 <td className="p-3">{ss.price_rwf?.toLocaleString()} RWF</td>
                 <td className="p-3 text-xs font-mono">{ss.payment_reference ?? "—"}</td>
-                <td className="p-3">{ss.expires_at ? new Date(ss.expires_at).toLocaleDateString() : "—"}</td>
+                <td className="p-3">
+                  {ss.expires_at ? new Date(ss.expires_at).toLocaleDateString() : "—"}
+                </td>
                 <td className="p-3">
                   {ss.is_active ? (
                     <Badge className="bg-green-100 text-green-700">Active</Badge>
@@ -870,16 +989,36 @@ function SubscriptionsList() {
                   )}
                 </td>
                 <td className="p-3 text-right">
-                  <Button size="sm" variant="outline" onClick={async () => {
-                    await supabase.from("subscriptions").update({ is_active: !ss.is_active }).eq("id", ss.id);
-                    if (!ss.is_active) {
-                      await supabase.from("vendors").update({ subscription_status: ss.plan as "basic" | "pro", subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }).eq("id", ss.vendor_id);
-                    } else {
-                      await supabase.from("vendors").update({ subscription_status: "free" }).eq("id", ss.vendor_id);
-                    }
-                    qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
-                    toast.success(ss.is_active ? "Subscription deactivated" : "Subscription reactivated");
-                  }}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      await supabase
+                        .from("subscriptions")
+                        .update({ is_active: !ss.is_active })
+                        .eq("id", ss.id);
+                      if (!ss.is_active) {
+                        await supabase
+                          .from("vendors")
+                          .update({
+                            subscription_status: ss.plan as "basic" | "pro",
+                            subscription_expires_at: new Date(
+                              Date.now() + 30 * 24 * 60 * 60 * 1000,
+                            ).toISOString(),
+                          })
+                          .eq("id", ss.vendor_id);
+                      } else {
+                        await supabase
+                          .from("vendors")
+                          .update({ subscription_status: "free" })
+                          .eq("id", ss.vendor_id);
+                      }
+                      qc.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+                      toast.success(
+                        ss.is_active ? "Subscription deactivated" : "Subscription reactivated",
+                      );
+                    }}
+                  >
                     {ss.is_active ? "Deactivate" : "Reactivate"}
                   </Button>
                 </td>
@@ -888,6 +1027,62 @@ function SubscriptionsList() {
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function ExchangeRates() {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["admin", "rates"],
+    queryFn: async () =>
+      (await supabase.from("exchange_rates").select("*").order("currency")).data ?? [],
+  });
+  const save = async (currency: string, value: string) => {
+    const rate = Number(value);
+    if (!(rate > 0)) {
+      toast.error("Enter a rate above zero");
+      return;
+    }
+    const { error } = await supabase
+      .from("exchange_rates")
+      .update({ rwf_per_unit: rate })
+      .eq("currency", currency);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`${currency} rate saved`);
+    qc.invalidateQueries({ queryKey: ["admin", "rates"] });
+    qc.invalidateQueries({ queryKey: ["exchange-rates"] });
+  };
+  return (
+    <div className="mt-4 max-w-md space-y-3 rounded-lg border bg-card p-5">
+      <p className="text-sm text-muted-foreground">
+        RWF per one unit of each currency. These only change the estimates visitors see; prices stay
+        in RWF.
+      </p>
+      {data?.map((r) => (
+        <div key={r.currency} className="flex items-center gap-3">
+          <label htmlFor={`rate-${r.currency}`} className="w-12 font-semibold">
+            {r.currency}
+          </label>
+          <input
+            id={`rate-${r.currency}`}
+            type="number"
+            min={1}
+            defaultValue={r.rwf_per_unit}
+            onBlur={(e) => {
+              if (Number(e.target.value) !== Number(r.rwf_per_unit))
+                void save(r.currency, e.target.value);
+            }}
+            className="h-9 w-32 rounded-md border bg-background px-3"
+          />
+          <span className="text-sm text-muted-foreground">
+            Updated {new Date(r.updated_at).toLocaleDateString()}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

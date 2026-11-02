@@ -1,63 +1,111 @@
 import { Link } from "@tanstack/react-router";
-import { Home } from "lucide-react";
-import { SUPPORT_WHATSAPP, CONTACT_EMAIL } from "@/lib/constants";
+import { useTranslation } from "react-i18next";
+import { ImigongoBand } from "@/components/brand/Imigongo";
+import { Logo } from "@/components/brand/Logo";
+import { CONTACT_EMAIL, SUPPORT_WHATSAPP } from "@/lib/constants";
 
 export function Footer() {
+  const { t } = useTranslation();
+  const linkClass = "hover:text-white";
   return (
-    <footer className="border-t bg-muted/30 mt-16">
+    <footer className="mt-16 bg-ink text-white/75">
+      <ImigongoBand />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2 font-bold">
-              <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground">
-                <Home className="h-3.5 w-3.5" />
-              </span>
-              HomeLink Rwanda
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Rwanda's first trusted platform for finding rental houses and properties for sale. Built in Kigali, for Kigali — and all 30 districts.
-            </p>
-            <a href={`https://wa.me/${SUPPORT_WHATSAPP}`} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
-              📱 WhatsApp support
-            </a>
+            <Logo tone="light" />
+            <p className="mt-3 max-w-xs text-sm">{t("footer.tagline")}</p>
           </div>
-
           <div>
-            <h4 className="text-sm font-semibold mb-3">Browse</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/search" className="hover:text-foreground">All listings</Link></li>
-              <li><Link to="/search" search={{ type: "rent" } as never} className="hover:text-foreground">For rent</Link></li>
-              <li><Link to="/search" search={{ type: "sale" } as never} className="hover:text-foreground">For sale</Link></li>
-              <li><Link to="/search" search={{ district: "Gasabo" } as never} className="hover:text-foreground">Gasabo</Link></li>
-              <li><Link to="/search" search={{ district: "Kicukiro" } as never} className="hover:text-foreground">Kicukiro</Link></li>
-              <li><Link to="/search" search={{ district: "Nyarugenge" } as never} className="hover:text-foreground">Nyarugenge</Link></li>
+            <h2 className="mb-3 font-sans text-sm font-semibold tracking-normal text-white">
+              {t("footer.find")}
+            </h2>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/search" search={{ type: "rent" }} className={linkClass}>
+                  {t("home.filterRent")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/search" search={{ type: "sale" }} className={linkClass}>
+                  {t("home.filterSale")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/neighbourhoods" className={linkClass}>
+                  {t("nav.neighbourhoods")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/guide" className={linkClass}>
+                  {t("nav.guide")}
+                </Link>
+              </li>
             </ul>
           </div>
-
           <div>
-            <h4 className="text-sm font-semibold mb-3">For vendors</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/auth" search={{ mode: "signup" } as never} className="hover:text-foreground">Become a vendor</Link></li>
-              <li><Link to="/dashboard" className="hover:text-foreground">Vendor dashboard</Link></li>
-              <li><Link to="/post-listing" className="hover:text-foreground">Post a listing</Link></li>
-              <li><Link to="/about" className="hover:text-foreground">How it works</Link></li>
+            <h2 className="mb-3 font-sans text-sm font-semibold tracking-normal text-white">
+              {t("footer.list")}
+            </h2>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/for-apartments" className={linkClass}>
+                  {t("nav.forApartments")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/post-listing" className={linkClass}>
+                  {t("nav.post")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className={linkClass}>
+                  {t("nav.dashboard")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className={linkClass}>
+                  {t("nav.about")}
+                </Link>
+              </li>
             </ul>
           </div>
-
           <div>
-            <h4 className="text-sm font-semibold mb-3">Company</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-foreground">About us</Link></li>
-              <li><a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-foreground">Contact support</a></li>
+            <h2 className="mb-3 font-sans text-sm font-semibold tracking-normal text-white">
+              {t("footer.help")}
+            </h2>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a
+                  href={`https://wa.me/${SUPPORT_WHATSAPP}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={linkClass}
+                >
+                  {t("footer.whatsapp")}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+              <li>
+                <Link to="/terms" className={linkClass}>
+                  {t("footer.terms")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className={linkClass}>
+                  {t("footer.privacy")}
+                </Link>
+              </li>
             </ul>
-            <p className="mt-3 text-sm text-muted-foreground">🇷🇼 Built in Rwanda, for Rwanda</p>
           </div>
         </div>
-
-        <div className="mt-8 flex flex-col gap-1 border-t pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} HomeLink Rwanda. All rights reserved.</p>
-          <p>Kigali, Rwanda</p>
-        </div>
+        <p className="mt-8 border-t border-white/15 pt-6 text-sm">
+          © {new Date().getFullYear()} HomeLink Rwanda
+        </p>
       </div>
     </footer>
   );

@@ -12,6 +12,9 @@ function AuthLayout() {
   useEffect(() => {
     if (!loading && !isAuthenticated) navigate({ to: "/auth", search: { mode: "signin" } });
   }, [loading, isAuthenticated, navigate]);
-  if (loading || !isAuthenticated) return <div className="grid min-h-screen place-items-center text-muted-foreground">Loading…</div>;
+  if (loading || !isAuthenticated)
+    return (
+      <div className="grid min-h-screen place-items-center text-muted-foreground">Loading…</div>
+    );
   return <Outlet />;
 }

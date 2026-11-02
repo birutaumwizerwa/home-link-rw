@@ -1,64 +1,49 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Navbar } from "@/components/Navbar";
+import { useTranslation } from "react-i18next";
 import { Footer } from "@/components/Footer";
-import { Search, ShieldCheck, MessageSquare, Building2 } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "How it works — HomeLink Rwanda" },
-      { name: "description", content: "Learn how HomeLink Rwanda connects renters, buyers, landlords and brokers across all 30 districts — safely and directly." },
-      { property: "og:title", content: "How it works — HomeLink Rwanda" },
-      { property: "og:description", content: "Rwanda's first trusted real estate platform. Search, contact verified vendors, and find your home." },
+      { title: "How HomeLink Rwanda works" },
+      {
+        name: "description",
+        content:
+          "How renters, buyers, landlords and apartment operators use HomeLink Rwanda to find and fill homes safely.",
+      },
     ],
   }),
   component: AboutPage,
 });
 
-const steps = [
-  { icon: Search, title: "Search & filter", desc: "Browse listings across all 30 Rwanda districts. Filter by price, bedrooms, location and amenities." },
-  { icon: ShieldCheck, title: "Trust verified vendors", desc: "Every vendor is reviewed. The verified badge means the vendor has been manually confirmed by our team." },
-  { icon: MessageSquare, title: "Contact directly", desc: "Chat in-app or contact via WhatsApp. No middlemen. No hidden fees. Just you and the landlord." },
-  { icon: Building2, title: "Find your home", desc: "Rent or buy with confidence. Save favourites, compare options, and move when you're ready." },
-];
-
 function AboutPage() {
+  const { t } = useTranslation();
   return (
-    <div className="min-h-screen flex flex-col pb-16 md:pb-0">
+    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
       <Navbar />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6">
-        <section className="text-center">
-          <h1 className="text-3xl font-bold leading-tight sm:text-5xl">Rwanda's first trusted<br />real estate platform</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            HomeLink Rwanda connects renters, buyers, landlords and brokers across the country — safely, directly, and for free.
-          </p>
-        </section>
-
-        <section className="mt-14">
-          <h2 className="mb-8 text-center text-2xl font-bold">How it works</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {steps.map((s) => (
-              <div key={s.title} className="rounded-2xl border bg-card p-6 text-center">
-                <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary">
-                  <s.icon className="h-6 w-6" />
-                </div>
-                <h3 className="mt-4 font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
+        <h1 className="text-4xl font-bold">{t("about.title")}</h1>
+        <p className="mt-2 text-lg text-muted-foreground">{t("about.subtitle")}</p>
+        <ol className="mt-8 space-y-6">
+          {[1, 2, 3, 4].map((n) => (
+            <li key={n} className="grid grid-cols-[2.5rem_1fr] gap-2">
+              <span className="font-display text-2xl font-bold text-primary">{n}</span>
+              <div>
+                <h2 className="text-xl font-bold">{t(`about.step${n}Title`)}</h2>
+                <p className="mt-1 text-muted-foreground">{t(`about.step${n}Body`)}</p>
               </div>
-            ))}
-          </div>
+            </li>
+          ))}
+        </ol>
+        <section className="mt-10 border-t pt-6">
+          <h2 className="text-2xl font-bold">{t("about.verifiedTitle")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("about.verifiedBody")}</p>
         </section>
-
-        <section className="mt-14 rounded-2xl bg-primary p-8 text-center text-primary-foreground sm:p-12">
-          <h2 className="text-2xl font-bold sm:text-3xl">Are you a landlord or broker?</h2>
-          <p className="mx-auto mt-2 max-w-xl text-white/90">
-            Post your first 3 listings for free. Reach thousands of verified renters and buyers across Rwanda. No setup fees.
-          </p>
-          <Button asChild size="lg" variant="secondary" className="mt-6 rounded-xl">
-            <Link to="/auth" search={{ mode: "signup" } as never}>Start posting for free</Link>
-          </Button>
-        </section>
+        <Button asChild className="mt-8">
+          <Link to="/search">{t("listing.searchHomes")}</Link>
+        </Button>
       </main>
       <Footer />
     </div>

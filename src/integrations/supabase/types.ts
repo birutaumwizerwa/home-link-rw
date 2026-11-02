@@ -1,595 +1,820 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
+    PostgrestVersion: "14.5";
+  };
   public: {
     Tables: {
+      buildings: {
+        Row: {
+          id: string;
+          vendor_id: string;
+          name: string;
+          description: string | null;
+          district: string;
+          sector: string | null;
+          cell: string | null;
+          address_details: string | null;
+          cover_image_url: string | null;
+          total_units: number | null;
+          year_built: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          vendor_id: string;
+          name: string;
+          description?: string | null;
+          district: string;
+          sector?: string | null;
+          cell?: string | null;
+          address_details?: string | null;
+          cover_image_url?: string | null;
+          total_units?: number | null;
+          year_built?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          vendor_id?: string;
+          name?: string;
+          description?: string | null;
+          district?: string;
+          sector?: string | null;
+          cell?: string | null;
+          address_details?: string | null;
+          cover_image_url?: string | null;
+          total_units?: number | null;
+          year_built?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      viewing_requests: {
+        Row: {
+          id: string;
+          listing_id: string;
+          client_id: string;
+          vendor_id: string;
+          preferred_at: string;
+          mode: string;
+          move_in_date: string | null;
+          stay_months: number | null;
+          message: string | null;
+          status: string;
+          vendor_note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          client_id: string;
+          vendor_id: string;
+          preferred_at: string;
+          mode?: string;
+          move_in_date?: string | null;
+          stay_months?: number | null;
+          message?: string | null;
+          status?: string;
+          vendor_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          listing_id?: string;
+          client_id?: string;
+          vendor_id?: string;
+          preferred_at?: string;
+          mode?: string;
+          move_in_date?: string | null;
+          stay_months?: number | null;
+          message?: string | null;
+          status?: string;
+          vendor_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      reviews: {
+        Row: {
+          id: string;
+          vendor_id: string;
+          reviewer_id: string;
+          rating: number;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          vendor_id: string;
+          reviewer_id: string;
+          rating: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          vendor_id?: string;
+          reviewer_id?: string;
+          rating?: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      saved_searches: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          filters: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          filters?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          filters?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      exchange_rates: {
+        Row: {
+          currency: string;
+          rwf_per_unit: number;
+          updated_at: string;
+        };
+        Insert: {
+          currency: string;
+          rwf_per_unit: number;
+          updated_at?: string;
+        };
+        Update: {
+          currency?: string;
+          rwf_per_unit?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       chats: {
         Row: {
-          client_id: string
-          client_unread: number
-          created_at: string
-          id: string
-          last_message: string | null
-          last_message_at: string | null
-          listing_id: string | null
-          vendor_id: string
-          vendor_unread: number
-        }
+          client_id: string;
+          client_unread: number;
+          created_at: string;
+          id: string;
+          last_message: string | null;
+          last_message_at: string | null;
+          listing_id: string | null;
+          vendor_id: string;
+          vendor_unread: number;
+        };
         Insert: {
-          client_id: string
-          client_unread?: number
-          created_at?: string
-          id?: string
-          last_message?: string | null
-          last_message_at?: string | null
-          listing_id?: string | null
-          vendor_id: string
-          vendor_unread?: number
-        }
+          client_id: string;
+          client_unread?: number;
+          created_at?: string;
+          id?: string;
+          last_message?: string | null;
+          last_message_at?: string | null;
+          listing_id?: string | null;
+          vendor_id: string;
+          vendor_unread?: number;
+        };
         Update: {
-          client_id?: string
-          client_unread?: number
-          created_at?: string
-          id?: string
-          last_message?: string | null
-          last_message_at?: string | null
-          listing_id?: string | null
-          vendor_id?: string
-          vendor_unread?: number
-        }
+          client_id?: string;
+          client_unread?: number;
+          created_at?: string;
+          id?: string;
+          last_message?: string | null;
+          last_message_at?: string | null;
+          listing_id?: string | null;
+          vendor_id?: string;
+          vendor_unread?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "chats_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
+            foreignKeyName: "chats_listing_id_fkey";
+            columns: ["listing_id"];
+            isOneToOne: false;
+            referencedRelation: "listings";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       listing_images: {
         Row: {
-          created_at: string
-          id: string
-          image_url: string
-          listing_id: string
-          sort_order: number
-        }
+          created_at: string;
+          id: string;
+          image_url: string;
+          listing_id: string;
+          sort_order: number;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          image_url: string
-          listing_id: string
-          sort_order?: number
-        }
+          created_at?: string;
+          id?: string;
+          image_url: string;
+          listing_id: string;
+          sort_order?: number;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          image_url?: string
-          listing_id?: string
-          sort_order?: number
-        }
+          created_at?: string;
+          id?: string;
+          image_url?: string;
+          listing_id?: string;
+          sort_order?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "listing_images_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
+            foreignKeyName: "listing_images_listing_id_fkey";
+            columns: ["listing_id"];
+            isOneToOne: false;
+            referencedRelation: "listings";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       listings: {
         Row: {
-          address_details: string | null
-          bathrooms: number
-          bedrooms: number
-          cell: string | null
-          cover_image_url: string | null
-          created_at: string
-          description: string | null
-          district: string
-          has_balcony: boolean
-          has_furnished: boolean
-          has_generator: boolean
-          has_kitchen: boolean
-          has_parking: boolean
-          has_security: boolean
-          has_water: boolean
-          has_wifi: boolean
-          id: string
-          is_approved: boolean
-          is_available: boolean
-          is_featured: boolean
-          listing_type: Database["public"]["Enums"]["listing_kind"]
-          price: number
-          price_period: Database["public"]["Enums"]["price_period_kind"]
-          property_type: Database["public"]["Enums"]["property_kind"]
-          sector: string | null
-          size_sqm: number | null
-          title: string
-          updated_at: string
-          vendor_id: string
-          views_count: number
-        }
+          building_id: string | null;
+          unit_label: string | null;
+          min_stay_months: number | null;
+          available_from: string | null;
+          deposit_months: number | null;
+          utilities_included: boolean;
+          english_lease: boolean;
+          video_url: string | null;
+          has_hot_water: boolean;
+          has_ac: boolean;
+          has_laundry: boolean;
+          has_gym: boolean;
+          has_pool: boolean;
+          has_elevator: boolean;
+          has_workspace: boolean;
+          has_housekeeping: boolean;
+          pets_allowed: boolean;
+          address_details: string | null;
+          bathrooms: number;
+          bedrooms: number;
+          cell: string | null;
+          cover_image_url: string | null;
+          created_at: string;
+          description: string | null;
+          district: string;
+          has_balcony: boolean;
+          has_furnished: boolean;
+          has_generator: boolean;
+          has_kitchen: boolean;
+          has_parking: boolean;
+          has_security: boolean;
+          has_water: boolean;
+          has_wifi: boolean;
+          id: string;
+          is_approved: boolean;
+          is_available: boolean;
+          is_featured: boolean;
+          listing_type: Database["public"]["Enums"]["listing_kind"];
+          price: number;
+          price_period: Database["public"]["Enums"]["price_period_kind"];
+          property_type: Database["public"]["Enums"]["property_kind"];
+          sector: string | null;
+          size_sqm: number | null;
+          title: string;
+          updated_at: string;
+          vendor_id: string;
+          views_count: number;
+        };
         Insert: {
-          address_details?: string | null
-          bathrooms?: number
-          bedrooms?: number
-          cell?: string | null
-          cover_image_url?: string | null
-          created_at?: string
-          description?: string | null
-          district: string
-          has_balcony?: boolean
-          has_furnished?: boolean
-          has_generator?: boolean
-          has_kitchen?: boolean
-          has_parking?: boolean
-          has_security?: boolean
-          has_water?: boolean
-          has_wifi?: boolean
-          id?: string
-          is_approved?: boolean
-          is_available?: boolean
-          is_featured?: boolean
-          listing_type: Database["public"]["Enums"]["listing_kind"]
-          price: number
-          price_period?: Database["public"]["Enums"]["price_period_kind"]
-          property_type: Database["public"]["Enums"]["property_kind"]
-          sector?: string | null
-          size_sqm?: number | null
-          title: string
-          updated_at?: string
-          vendor_id: string
-          views_count?: number
-        }
+          building_id?: string | null;
+          unit_label?: string | null;
+          min_stay_months?: number | null;
+          available_from?: string | null;
+          deposit_months?: number | null;
+          utilities_included?: boolean;
+          english_lease?: boolean;
+          video_url?: string | null;
+          has_hot_water?: boolean;
+          has_ac?: boolean;
+          has_laundry?: boolean;
+          has_gym?: boolean;
+          has_pool?: boolean;
+          has_elevator?: boolean;
+          has_workspace?: boolean;
+          has_housekeeping?: boolean;
+          pets_allowed?: boolean;
+          address_details?: string | null;
+          bathrooms?: number;
+          bedrooms?: number;
+          cell?: string | null;
+          cover_image_url?: string | null;
+          created_at?: string;
+          description?: string | null;
+          district: string;
+          has_balcony?: boolean;
+          has_furnished?: boolean;
+          has_generator?: boolean;
+          has_kitchen?: boolean;
+          has_parking?: boolean;
+          has_security?: boolean;
+          has_water?: boolean;
+          has_wifi?: boolean;
+          id?: string;
+          is_approved?: boolean;
+          is_available?: boolean;
+          is_featured?: boolean;
+          listing_type: Database["public"]["Enums"]["listing_kind"];
+          price: number;
+          price_period?: Database["public"]["Enums"]["price_period_kind"];
+          property_type: Database["public"]["Enums"]["property_kind"];
+          sector?: string | null;
+          size_sqm?: number | null;
+          title: string;
+          updated_at?: string;
+          vendor_id: string;
+          views_count?: number;
+        };
         Update: {
-          address_details?: string | null
-          bathrooms?: number
-          bedrooms?: number
-          cell?: string | null
-          cover_image_url?: string | null
-          created_at?: string
-          description?: string | null
-          district?: string
-          has_balcony?: boolean
-          has_furnished?: boolean
-          has_generator?: boolean
-          has_kitchen?: boolean
-          has_parking?: boolean
-          has_security?: boolean
-          has_water?: boolean
-          has_wifi?: boolean
-          id?: string
-          is_approved?: boolean
-          is_available?: boolean
-          is_featured?: boolean
-          listing_type?: Database["public"]["Enums"]["listing_kind"]
-          price?: number
-          price_period?: Database["public"]["Enums"]["price_period_kind"]
-          property_type?: Database["public"]["Enums"]["property_kind"]
-          sector?: string | null
-          size_sqm?: number | null
-          title?: string
-          updated_at?: string
-          vendor_id?: string
-          views_count?: number
-        }
+          building_id?: string | null;
+          unit_label?: string | null;
+          min_stay_months?: number | null;
+          available_from?: string | null;
+          deposit_months?: number | null;
+          utilities_included?: boolean;
+          english_lease?: boolean;
+          video_url?: string | null;
+          has_hot_water?: boolean;
+          has_ac?: boolean;
+          has_laundry?: boolean;
+          has_gym?: boolean;
+          has_pool?: boolean;
+          has_elevator?: boolean;
+          has_workspace?: boolean;
+          has_housekeeping?: boolean;
+          pets_allowed?: boolean;
+          address_details?: string | null;
+          bathrooms?: number;
+          bedrooms?: number;
+          cell?: string | null;
+          cover_image_url?: string | null;
+          created_at?: string;
+          description?: string | null;
+          district?: string;
+          has_balcony?: boolean;
+          has_furnished?: boolean;
+          has_generator?: boolean;
+          has_kitchen?: boolean;
+          has_parking?: boolean;
+          has_security?: boolean;
+          has_water?: boolean;
+          has_wifi?: boolean;
+          id?: string;
+          is_approved?: boolean;
+          is_available?: boolean;
+          is_featured?: boolean;
+          listing_type?: Database["public"]["Enums"]["listing_kind"];
+          price?: number;
+          price_period?: Database["public"]["Enums"]["price_period_kind"];
+          property_type?: Database["public"]["Enums"]["property_kind"];
+          sector?: string | null;
+          size_sqm?: number | null;
+          title?: string;
+          updated_at?: string;
+          vendor_id?: string;
+          views_count?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "listings_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
+            foreignKeyName: "listings_vendor_id_fkey";
+            columns: ["vendor_id"];
+            isOneToOne: false;
+            referencedRelation: "vendors";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       messages: {
         Row: {
-          chat_id: string
-          content: string
-          created_at: string
-          id: string
-          is_read: boolean
-          sender_id: string
-        }
+          chat_id: string;
+          content: string;
+          created_at: string;
+          id: string;
+          is_read: boolean;
+          sender_id: string;
+        };
         Insert: {
-          chat_id: string
-          content: string
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          sender_id: string
-        }
+          chat_id: string;
+          content: string;
+          created_at?: string;
+          id?: string;
+          is_read?: boolean;
+          sender_id: string;
+        };
         Update: {
-          chat_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_read?: boolean
-          sender_id?: string
-        }
+          chat_id?: string;
+          content?: string;
+          created_at?: string;
+          id?: string;
+          is_read?: boolean;
+          sender_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "messages_chat_id_fkey"
-            columns: ["chat_id"]
-            isOneToOne: false
-            referencedRelation: "chats"
-            referencedColumns: ["id"]
+            foreignKeyName: "messages_chat_id_fkey";
+            columns: ["chat_id"];
+            isOneToOne: false;
+            referencedRelation: "chats";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       profiles: {
         Row: {
-          avatar_url: string | null
-          created_at: string
-          full_name: string
-          id: string
-          is_banned: boolean
-          location: string | null
-          phone: string | null
-        }
+          avatar_url: string | null;
+          created_at: string;
+          full_name: string;
+          id: string;
+          is_banned: boolean;
+          location: string | null;
+          phone: string | null;
+        };
         Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name: string
-          id: string
-          is_banned?: boolean
-          location?: string | null
-          phone?: string | null
-        }
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name: string;
+          id: string;
+          is_banned?: boolean;
+          location?: string | null;
+          phone?: string | null;
+        };
         Update: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name?: string
-          id?: string
-          is_banned?: boolean
-          location?: string | null
-          phone?: string | null
-        }
-        Relationships: []
-      }
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name?: string;
+          id?: string;
+          is_banned?: boolean;
+          location?: string | null;
+          phone?: string | null;
+        };
+        Relationships: [];
+      };
       reports: {
         Row: {
-          created_at: string
-          details: string | null
-          id: string
-          is_resolved: boolean
-          listing_id: string
-          reason: string
-          reporter_id: string | null
-        }
+          created_at: string;
+          details: string | null;
+          id: string;
+          is_resolved: boolean;
+          listing_id: string;
+          reason: string;
+          reporter_id: string | null;
+        };
         Insert: {
-          created_at?: string
-          details?: string | null
-          id?: string
-          is_resolved?: boolean
-          listing_id: string
-          reason: string
-          reporter_id?: string | null
-        }
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          is_resolved?: boolean;
+          listing_id: string;
+          reason: string;
+          reporter_id?: string | null;
+        };
         Update: {
-          created_at?: string
-          details?: string | null
-          id?: string
-          is_resolved?: boolean
-          listing_id?: string
-          reason?: string
-          reporter_id?: string | null
-        }
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          is_resolved?: boolean;
+          listing_id?: string;
+          reason?: string;
+          reporter_id?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "reports_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
+            foreignKeyName: "reports_listing_id_fkey";
+            columns: ["listing_id"];
+            isOneToOne: false;
+            referencedRelation: "listings";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       saved_listings: {
         Row: {
-          created_at: string
-          id: string
-          listing_id: string
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          listing_id: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          listing_id: string
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          listing_id: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          listing_id?: string
-          user_id?: string
-        }
+          created_at?: string;
+          id?: string;
+          listing_id?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "saved_listings_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
+            foreignKeyName: "saved_listings_listing_id_fkey";
+            columns: ["listing_id"];
+            isOneToOne: false;
+            referencedRelation: "listings";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       subscriptions: {
         Row: {
-          activated_by: string | null
-          created_at: string
-          expires_at: string
-          id: string
-          is_active: boolean
-          payment_method: string
-          payment_reference: string | null
-          plan: Database["public"]["Enums"]["sub_plan"]
-          price_rwf: number
-          starts_at: string
-          vendor_id: string
-        }
+          activated_by: string | null;
+          created_at: string;
+          expires_at: string;
+          id: string;
+          is_active: boolean;
+          payment_method: string;
+          payment_reference: string | null;
+          plan: Database["public"]["Enums"]["sub_plan"];
+          price_rwf: number;
+          starts_at: string;
+          vendor_id: string;
+        };
         Insert: {
-          activated_by?: string | null
-          created_at?: string
-          expires_at: string
-          id?: string
-          is_active?: boolean
-          payment_method?: string
-          payment_reference?: string | null
-          plan: Database["public"]["Enums"]["sub_plan"]
-          price_rwf: number
-          starts_at?: string
-          vendor_id: string
-        }
+          activated_by?: string | null;
+          created_at?: string;
+          expires_at: string;
+          id?: string;
+          is_active?: boolean;
+          payment_method?: string;
+          payment_reference?: string | null;
+          plan: Database["public"]["Enums"]["sub_plan"];
+          price_rwf: number;
+          starts_at?: string;
+          vendor_id: string;
+        };
         Update: {
-          activated_by?: string | null
-          created_at?: string
-          expires_at?: string
-          id?: string
-          is_active?: boolean
-          payment_method?: string
-          payment_reference?: string | null
-          plan?: Database["public"]["Enums"]["sub_plan"]
-          price_rwf?: number
-          starts_at?: string
-          vendor_id?: string
-        }
+          activated_by?: string | null;
+          created_at?: string;
+          expires_at?: string;
+          id?: string;
+          is_active?: boolean;
+          payment_method?: string;
+          payment_reference?: string | null;
+          plan?: Database["public"]["Enums"]["sub_plan"];
+          price_rwf?: number;
+          starts_at?: string;
+          vendor_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "subscriptions_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
+            foreignKeyName: "subscriptions_vendor_id_fkey";
+            columns: ["vendor_id"];
+            isOneToOne: false;
+            referencedRelation: "vendors";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       user_roles: {
         Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       vendors: {
         Row: {
-          business_name: string | null
-          created_at: string
-          free_posts_used: number
-          id: string
-          is_verified: boolean
-          subscription_expires_at: string | null
-          subscription_status: Database["public"]["Enums"]["sub_status"]
-          whatsapp_number: string | null
-        }
+          bio: string | null;
+          languages: string[];
+          vendor_type: string;
+          business_name: string | null;
+          created_at: string;
+          free_posts_used: number;
+          id: string;
+          is_verified: boolean;
+          subscription_expires_at: string | null;
+          subscription_status: Database["public"]["Enums"]["sub_status"];
+          whatsapp_number: string | null;
+        };
         Insert: {
-          business_name?: string | null
-          created_at?: string
-          free_posts_used?: number
-          id: string
-          is_verified?: boolean
-          subscription_expires_at?: string | null
-          subscription_status?: Database["public"]["Enums"]["sub_status"]
-          whatsapp_number?: string | null
-        }
+          bio?: string | null;
+          languages?: string[];
+          vendor_type?: string;
+          business_name?: string | null;
+          created_at?: string;
+          free_posts_used?: number;
+          id: string;
+          is_verified?: boolean;
+          subscription_expires_at?: string | null;
+          subscription_status?: Database["public"]["Enums"]["sub_status"];
+          whatsapp_number?: string | null;
+        };
         Update: {
-          business_name?: string | null
-          created_at?: string
-          free_posts_used?: number
-          id?: string
-          is_verified?: boolean
-          subscription_expires_at?: string | null
-          subscription_status?: Database["public"]["Enums"]["sub_status"]
-          whatsapp_number?: string | null
-        }
+          bio?: string | null;
+          languages?: string[];
+          vendor_type?: string;
+          business_name?: string | null;
+          created_at?: string;
+          free_posts_used?: number;
+          id?: string;
+          is_verified?: boolean;
+          subscription_expires_at?: string | null;
+          subscription_status?: Database["public"]["Enums"]["sub_status"];
+          whatsapp_number?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "vendors_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            foreignKeyName: "vendors_id_fkey";
+            columns: ["id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
           },
-        ]
-      }
-    }
+        ];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      vendor_ratings: {
+        Row: { vendor_id: string; average_rating: number; review_count: number };
+        Relationships: [];
+      };
+    };
     Functions: {
+      become_vendor: { Args: Record<string, never>; Returns: undefined };
+      record_listing_view: { Args: { _listing_id: string }; Returns: undefined };
+      can_review_vendor: { Args: { _vendor_id: string }; Returns: boolean };
+      get_my_profile: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["profiles"]["Row"][];
+      };
+      admin_list_profiles: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["profiles"]["Row"][];
+      };
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-    }
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
+    };
     Enums: {
-      app_role: "client" | "vendor" | "admin"
-      listing_kind: "rent" | "sale"
-      price_period_kind: "monthly" | "yearly" | "fixed"
-      property_kind:
-        | "house"
-        | "apartment"
-        | "studio"
-        | "room"
-        | "commercial"
-        | "villa"
-      sub_plan: "basic" | "pro"
-      sub_status: "free" | "basic" | "pro"
-    }
+      app_role: "client" | "vendor" | "admin";
+      listing_kind: "rent" | "sale";
+      price_period_kind: "monthly" | "yearly" | "fixed";
+      property_kind: "house" | "apartment" | "studio" | "room" | "commercial" | "villa";
+      sub_plan: "basic" | "pro";
+      sub_status: "free" | "basic" | "pro";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
@@ -597,16 +822,9 @@ export const Constants = {
       app_role: ["client", "vendor", "admin"],
       listing_kind: ["rent", "sale"],
       price_period_kind: ["monthly", "yearly", "fixed"],
-      property_kind: [
-        "house",
-        "apartment",
-        "studio",
-        "room",
-        "commercial",
-        "villa",
-      ],
+      property_kind: ["house", "apartment", "studio", "room", "commercial", "villa"],
       sub_plan: ["basic", "pro"],
       sub_status: ["free", "basic", "pro"],
     },
   },
-} as const
+} as const;

@@ -18,7 +18,13 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,12 +60,8 @@ function ProfilePage() {
     queryKey: ["profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, phone, location, avatar_url")
-        .eq("id", user!.id)
-        .maybeSingle();
-      return data;
+      const { data } = await supabase.rpc("get_my_profile");
+      return data?.[0] ?? null;
     },
   });
 
@@ -89,16 +91,22 @@ function ProfilePage() {
 
   const saveProfile = useMutation({
     mutationFn: async (v: ProfileForm) => {
-      await supabase.from("profiles").update({
-        full_name: v.full_name,
-        phone: v.phone || null,
-        location: v.location || null,
-      }).eq("id", user!.id);
+      await supabase
+        .from("profiles")
+        .update({
+          full_name: v.full_name,
+          phone: v.phone || null,
+          location: v.location || null,
+        })
+        .eq("id", user!.id);
       if (isVendor) {
-        await supabase.from("vendors").update({
-          business_name: v.business_name || null,
-          whatsapp_number: v.whatsapp_number || null,
-        }).eq("id", user!.id);
+        await supabase
+          .from("vendors")
+          .update({
+            business_name: v.business_name || null,
+            whatsapp_number: v.whatsapp_number || null,
+          })
+          .eq("id", user!.id);
       }
     },
     onSuccess: () => {
@@ -130,7 +138,9 @@ function ProfilePage() {
         .from("avatars")
         .upload(path, file, { upsert: true, contentType: file.type });
       if (uploadError) throw uploadError;
-      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(path);
       await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("id", user.id);
       toast.success("Profile photo updated");
       refetch();
@@ -163,7 +173,9 @@ function ProfilePage() {
           <div className="relative">
             <Avatar className="h-20 w-20">
               <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
-              <AvatarFallback className="bg-primary/15 text-primary text-lg font-semibold">{initials(name)}</AvatarFallback>
+              <AvatarFallback className="bg-primary/15 text-primary text-lg font-semibold">
+                {initials(name)}
+              </AvatarFallback>
             </Avatar>
             <button
               type="button"
@@ -172,15 +184,29 @@ function ProfilePage() {
               className="absolute bottom-0 right-0 grid h-8 w-8 place-items-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-md transition hover:bg-primary/90 disabled:opacity-60"
               aria-label={t("profile.changePhoto")}
             >
-              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
             </button>
-            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarUpload} />
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
           </div>
           <div className="flex-1">
             <p className="font-semibold">{name}</p>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
             {profile?.avatar_url && (
-              <button type="button" onClick={removeAvatar} className="mt-1 text-xs text-destructive hover:underline">
+              <button
+                type="button"
+                onClick={removeAvatar}
+                className="mt-1 text-xs text-destructive hover:underline"
+              >
                 {t("profile.removePhoto")}
               </button>
             )}
@@ -189,14 +215,19 @@ function ProfilePage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={form.handleSubmit((v) => saveProfile.mutate(v))} className="space-y-5 rounded-2xl border bg-card p-6">
+        <form
+          onSubmit={form.handleSubmit((v) => saveProfile.mutate(v))}
+          className="space-y-5 rounded-2xl border bg-card p-6"
+        >
           <h2 className="text-lg font-semibold">{t("profile.personalInfo")}</h2>
 
           <div>
             <Label>{t("profile.fullName")} *</Label>
             <Input className="mt-1.5" {...form.register("full_name")} />
             {form.formState.errors.full_name && (
-              <p className="mt-1 text-xs text-destructive">{form.formState.errors.full_name.message}</p>
+              <p className="mt-1 text-xs text-destructive">
+                {form.formState.errors.full_name.message}
+              </p>
             )}
           </div>
 
@@ -207,10 +238,19 @@ function ProfilePage() {
 
           <div>
             <Label>{t("profile.district")}</Label>
-            <Select value={form.watch("location") || undefined} onValueChange={(v) => form.setValue("location", v)}>
-              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select district" /></SelectTrigger>
+            <Select
+              value={form.watch("location") || undefined}
+              onValueChange={(v) => form.setValue("location", v)}
+            >
+              <SelectTrigger className="mt-1.5">
+                <SelectValue placeholder="Select district" />
+              </SelectTrigger>
               <SelectContent>
-                {DISTRICTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                {DISTRICTS.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -231,7 +271,11 @@ function ProfilePage() {
               </div>
               <div>
                 <Label>{t("profile.whatsappNumber")} *</Label>
-                <Input className="mt-1.5" {...form.register("whatsapp_number")} placeholder="07XXXXXXXX" />
+                <Input
+                  className="mt-1.5"
+                  {...form.register("whatsapp_number")}
+                  placeholder="07XXXXXXXX"
+                />
                 <p className="mt-1 text-xs text-muted-foreground">{t("profile.whatsappHint")}</p>
               </div>
             </>
@@ -269,8 +313,11 @@ function ProfilePage() {
             variant="destructive"
             className="mt-3"
             onClick={() => {
-              const confirmed = window.confirm("Are you sure you want to delete your account? This cannot be undone.");
-              if (confirmed) toast.error("Account deletion — contact support@homelink.rw to proceed.");
+              const confirmed = window.confirm(
+                "Are you sure you want to delete your account? This cannot be undone.",
+              );
+              if (confirmed)
+                toast.error("Account deletion — contact support@homelink.rw to proceed.");
             }}
           >
             {t("profile.deleteBtn")}

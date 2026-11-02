@@ -9,23 +9,70 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as GuideRouteImport } from './routes/guide'
+import { Route as ForApartmentsRouteImport } from './routes/for-apartments'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NeighbourhoodsIndexRouteImport } from './routes/neighbourhoods.index'
 import { Route as VendorIdRouteImport } from './routes/vendor.$id'
+import { Route as NeighbourhoodsSlugRouteImport } from './routes/neighbourhoods.$slug'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as BuildingIdRouteImport } from './routes/building.$id'
+import { Route as AuthenticatedViewingsRouteImport } from './routes/_authenticated.viewings'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated.saved'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedPostListingRouteImport } from './routes/_authenticated.post-listing'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated.messages'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedEditListingIdRouteImport } from './routes/_authenticated.edit-listing.$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForApartmentsRoute = ForApartmentsRouteImport.update({
+  id: '/for-apartments',
+  path: '/for-apartments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -47,15 +94,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NeighbourhoodsIndexRoute = NeighbourhoodsIndexRouteImport.update({
+  id: '/neighbourhoods/',
+  path: '/neighbourhoods/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorIdRoute = VendorIdRouteImport.update({
   id: '/vendor/$id',
   path: '/vendor/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NeighbourhoodsSlugRoute = NeighbourhoodsSlugRouteImport.update({
+  id: '/neighbourhoods/$slug',
+  path: '/neighbourhoods/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BuildingIdRoute = BuildingIdRouteImport.update({
+  id: '/building/$id',
+  path: '/building/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedViewingsRoute = AuthenticatedViewingsRouteImport.update({
+  id: '/viewings',
+  path: '/viewings',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   id: '/saved',
@@ -88,34 +155,64 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEditListingIdRoute =
+  AuthenticatedEditListingIdRouteImport.update({
+    id: '/edit-listing/$id',
+    path: '/edit-listing/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/for-apartments': typeof ForApartmentsRoute
+  '/guide': typeof GuideRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/post-listing': typeof AuthenticatedPostListingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/viewings': typeof AuthenticatedViewingsRoute
+  '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/neighbourhoods/': typeof NeighbourhoodsIndexRoute
+  '/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/for-apartments': typeof ForApartmentsRoute
+  '/guide': typeof GuideRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/post-listing': typeof AuthenticatedPostListingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/viewings': typeof AuthenticatedViewingsRoute
+  '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/neighbourhoods': typeof NeighbourhoodsIndexRoute
+  '/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,15 +220,27 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
+  '/for-apartments': typeof ForApartmentsRoute
+  '/guide': typeof GuideRoute
+  '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/post-listing': typeof AuthenticatedPostListingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/_authenticated/viewings': typeof AuthenticatedViewingsRoute
+  '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/neighbourhoods/': typeof NeighbourhoodsIndexRoute
+  '/_authenticated/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,44 +248,80 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/compare'
+    | '/for-apartments'
+    | '/guide'
+    | '/privacy'
+    | '/reset-password'
     | '/search'
+    | '/sitemap.xml'
+    | '/terms'
     | '/admin'
     | '/dashboard'
     | '/messages'
     | '/post-listing'
     | '/profile'
     | '/saved'
+    | '/viewings'
+    | '/building/$id'
     | '/listing/$id'
+    | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/neighbourhoods/'
+    | '/edit-listing/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/auth'
+    | '/compare'
+    | '/for-apartments'
+    | '/guide'
+    | '/privacy'
+    | '/reset-password'
     | '/search'
+    | '/sitemap.xml'
+    | '/terms'
     | '/admin'
     | '/dashboard'
     | '/messages'
     | '/post-listing'
     | '/profile'
     | '/saved'
+    | '/viewings'
+    | '/building/$id'
     | '/listing/$id'
+    | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/neighbourhoods'
+    | '/edit-listing/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/compare'
+    | '/for-apartments'
+    | '/guide'
+    | '/privacy'
+    | '/reset-password'
     | '/search'
+    | '/sitemap.xml'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/messages'
     | '/_authenticated/post-listing'
     | '/_authenticated/profile'
     | '/_authenticated/saved'
+    | '/_authenticated/viewings'
+    | '/building/$id'
     | '/listing/$id'
+    | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/neighbourhoods/'
+    | '/_authenticated/edit-listing/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,18 +329,77 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  CompareRoute: typeof CompareRoute
+  ForApartmentsRoute: typeof ForApartmentsRoute
+  GuideRoute: typeof GuideRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
+  BuildingIdRoute: typeof BuildingIdRoute
   ListingIdRoute: typeof ListingIdRoute
+  NeighbourhoodsSlugRoute: typeof NeighbourhoodsSlugRoute
   VendorIdRoute: typeof VendorIdRoute
+  NeighbourhoodsIndexRoute: typeof NeighbourhoodsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-apartments': {
+      id: '/for-apartments'
+      path: '/for-apartments'
+      fullPath: '/for-apartments'
+      preLoaderRoute: typeof ForApartmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -226,11 +430,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/neighbourhoods/': {
+      id: '/neighbourhoods/'
+      path: '/neighbourhoods'
+      fullPath: '/neighbourhoods/'
+      preLoaderRoute: typeof NeighbourhoodsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor/$id': {
       id: '/vendor/$id'
       path: '/vendor/$id'
       fullPath: '/vendor/$id'
       preLoaderRoute: typeof VendorIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/neighbourhoods/$slug': {
+      id: '/neighbourhoods/$slug'
+      path: '/neighbourhoods/$slug'
+      fullPath: '/neighbourhoods/$slug'
+      preLoaderRoute: typeof NeighbourhoodsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -239,6 +457,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/building/$id': {
+      id: '/building/$id'
+      path: '/building/$id'
+      fullPath: '/building/$id'
+      preLoaderRoute: typeof BuildingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/viewings': {
+      id: '/_authenticated/viewings'
+      path: '/viewings'
+      fullPath: '/viewings'
+      preLoaderRoute: typeof AuthenticatedViewingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/saved': {
       id: '/_authenticated/saved'
@@ -282,6 +514,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/edit-listing/$id': {
+      id: '/_authenticated/edit-listing/$id'
+      path: '/edit-listing/$id'
+      fullPath: '/edit-listing/$id'
+      preLoaderRoute: typeof AuthenticatedEditListingIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -292,6 +531,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPostListingRoute: typeof AuthenticatedPostListingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+  AuthenticatedViewingsRoute: typeof AuthenticatedViewingsRoute
+  AuthenticatedEditListingIdRoute: typeof AuthenticatedEditListingIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -301,6 +542,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPostListingRoute: AuthenticatedPostListingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+  AuthenticatedViewingsRoute: AuthenticatedViewingsRoute,
+  AuthenticatedEditListingIdRoute: AuthenticatedEditListingIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -312,9 +555,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  CompareRoute: CompareRoute,
+  ForApartmentsRoute: ForApartmentsRoute,
+  GuideRoute: GuideRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
+  BuildingIdRoute: BuildingIdRoute,
   ListingIdRoute: ListingIdRoute,
+  NeighbourhoodsSlugRoute: NeighbourhoodsSlugRoute,
   VendorIdRoute: VendorIdRoute,
+  NeighbourhoodsIndexRoute: NeighbourhoodsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
