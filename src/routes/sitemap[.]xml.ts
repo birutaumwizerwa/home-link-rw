@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { SITE_URL } from "@/lib/constants";
 import { NEIGHBOURHOODS } from "@/lib/neighbourhoods";
+import { ALL_DISTRICTS } from "@/lib/rwanda-locations";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/for-apartments",
           "/about",
           ...NEIGHBOURHOODS.map((n) => `/neighbourhoods/${n.slug}`),
+          "/locations",
+          ...ALL_DISTRICTS.map((d) => `/locations/${d.toLowerCase()}`),
         ];
         const urls = [
           ...pages.map((p) => `<url><loc>${SITE_URL}${p}</loc></url>`),

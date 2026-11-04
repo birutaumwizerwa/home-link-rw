@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, X } from "lucide-react";
-import { Logo } from "@/components/brand/Logo";
+import { AuthFrame } from "@/components/brand/AuthFrame";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +19,13 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { homePath, safeNext } from "@/lib/roles";
 import { DISTRICTS } from "@/lib/constants";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup"]).optional() });
+const searchSchema = z.object({
+  mode: z.enum(["signin", "signup"]).optional(),
+  next: z.string().optional(),
+});
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -86,127 +90,90 @@ function AuthPage() {
   const { t } = useTranslation();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, roles, rolesLoaded } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
+  const next = safeNext(search.next);
 
   useEffect(() => {
-    if (user) navigate({ to: "/" });
-  }, [user, navigate]);
+    if (user && rolesLoaded) navigate({ to: next ?? homePath(roles), replace: true });
+  }, [user, rolesLoaded, roles, next, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6">
-          <Logo />
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-md flex-1 px-4 py-10">
-        <div className="rounded-lg border bg-card p-6 sm:p-8">
-          <h1 className="text-2xl font-bold">
-            {mode === "signin" ? t("auth.signInTitle") : t("auth.signUpTitle")}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin" ? t("auth.signInSub") : t("auth.signUpSub")}
-          </p>
+    <AuthFrame>
+      <h1 className="text-3xl font-bold">
+        {mode === "signin" ? t("auth.signInTitle") : t("auth.signUpTitle")}
+      </h1>
+      <p className="mt-1 text-muted-foreground">
+        {mode === "signin" ? t("auth.signInSub") : t("auth.signUpSub")}
+      </p>
+      <Button
+        variant="outline"
+        className="mt-6 w-full"
+        onClick={async () => {
+          const r = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
+            },
+          });
+          if (r.error) toast.error(r.error.message);
+        }}
+      >
+        <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48">
+          <path
+            fill="#FFC107"
+            d="M43.6 20.5H42V20H24v8h11.3c-0.8 3-3.3 5-7.3 5-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.3 2.8l5.7-5.7C34.7 5.9 29.7 3 24 3 12.9 3 4 12 4 23s8.9 20 20 20 20-8.9 20-20c0-1.7-0.2-3.4-0.4-5z"
+          />
+          <path
+            fill="#FF3D00"
+            d="M6.3 14.6l6.8 5c1.6-2.9 4.1-5.1 8-5.1 3.5 0 6.7 1.5 8.8 4.1l6.4-6.4C34.2 8.7 29.5 6 24 6c-6.5 0-12.2 3.2-15.6 8.1z"
+          />
+          <path
+            fill="#4CAF50"
+            d="M24 44c5.5 0 10.5-2.2 14.2-6.1l-6.5-5.5c-2 1.4-4.6 2.3-7.7 2.3-4.4 0-8.2-2.5-10-6.5l-6.8 5.2C11.8 39.7 17.5 44 24 44z"
+          />
+          <path
+            fill="#1976D2"
+            d="M44 24c0-1.1-0.1-2.2-0.3-3.3H24v8h11.3c-0.5 2.1-1.7 3.9-3.3 5.2l6.5 5.5C42.1 36.7 44 30.7 44 24z"
+          />
+        </svg>
+        {t("auth.withGoogle")}
+      </Button>
 
-          <Button
-            variant="outline"
-            className="mt-6 w-full"
-            onClick={async () => {
-              const r = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: { redirectTo: window.location.origin },
-              });
-              if (r.error) toast.error(r.error.message);
-            }}
-          >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48">
-              <path
-                fill="#FFC107"
-                d="M43.6 20.5H42V20H24v8h11.3c-0.8 3-3.3 5-7.3 5-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.3 2.8l5.7-5.7C34.7 5.9 29.7 3 24 3 12.9 3 4 12 4 23s8.9 20 20 20 20-8.9 20-20c0-1.7-0.2-3.4-0.4-5z"
-              />
-              <path
-                fill="#FF3D00"
-                d="M6.3 14.6l6.8 5c1.6-2.9 4.1-5.1 8-5.1 3.5 0 6.7 1.5 8.8 4.1l6.4-6.4C34.2 8.7 29.5 6 24 6c-6.5 0-12.2 3.2-15.6 8.1z"
-              />
-              <path
-                fill="#4CAF50"
-                d="M24 44c5.5 0 10.5-2.2 14.2-6.1l-6.5-5.5c-2 1.4-4.6 2.3-7.7 2.3-4.4 0-8.2-2.5-10-6.5l-6.8 5.2C11.8 39.7 17.5 44 24 44z"
-              />
-              <path
-                fill="#1976D2"
-                d="M44 24c0-1.1-0.1-2.2-0.3-3.3H24v8h11.3c-0.5 2.1-1.7 3.9-3.3 5.2l6.5 5.5C42.1 36.7 44 30.7 44 24z"
-              />
-            </svg>
-            {t("auth.withGoogle")}
-          </Button>
+      <div className="my-5 flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+      </div>
 
-          <div className="my-5 flex items-center gap-3 text-sm text-muted-foreground">
-            <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-          </div>
+      {mode === "signin" ? <SignInForm /> : <SignUpForm next={next} />}
 
-          {mode === "signin" ? <SignInForm /> : <SignUpForm />}
-
-          <button
-            type="button"
-            className="mt-6 w-full text-center text-sm text-primary hover:underline"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          >
-            {mode === "signin" ? t("auth.switchToSignUp") : t("auth.switchToSignIn")}
-          </button>
-        </div>
-      </main>
-    </div>
+      <button
+        type="button"
+        className="mt-6 w-full text-center text-sm font-medium text-primary hover:underline"
+        onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+      >
+        {mode === "signin" ? t("auth.switchToSignUp") : t("auth.switchToSignIn")}
+      </button>
+    </AuthFrame>
   );
 }
 
 function SignInForm() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const form = useForm<z.infer<typeof signinSchema>>({
     resolver: zodResolver(signinSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const forgot = async () => {
-    const email = form.getValues("email").trim();
-    if (!z.string().email().safeParse(email).success) {
-      toast.error(t("auth.enterEmailFirst"));
-      return;
-    }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) toast.error(error.message);
-    else toast.success(t("auth.resetSent"));
-  };
-
   const submit = async (v: z.infer<typeof signinSchema>) => {
-    // Use the login response directly instead of calling getUser() again
-    const { data: signInData, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: v.email,
       password: v.password,
     });
-
     if (error) {
-      toast.error(error.message);
+      toast.error(t("auth.signInFailed"));
       return;
     }
-
-    const userId = signInData.user?.id;
-    let roles: string[] = [];
-
-    if (userId) {
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-      roles = (data ?? []).map((r) => r.role as string);
-    }
-
     toast.success(t("auth.welcomeBack"));
-
-    // Admin goes to /admin, Vendor to /dashboard, Client to home
-    if (roles.includes("admin")) navigate({ to: "/admin" });
-    else if (roles.includes("vendor")) navigate({ to: "/dashboard" });
-    else navigate({ to: "/" });
   };
 
   return (
@@ -219,7 +186,12 @@ function SignInForm() {
         )}
       </div>
       <div>
-        <Label htmlFor="password">{t("auth.password")}</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">{t("auth.password")}</Label>
+          <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline">
+            {t("auth.forgot")}
+          </Link>
+        </div>
         <Input
           id="password"
           type="password"
@@ -230,18 +202,11 @@ function SignInForm() {
       <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
         {t("auth.submitSignIn")}
       </Button>
-      <button
-        type="button"
-        className="w-full text-center text-sm text-primary hover:underline"
-        onClick={forgot}
-      >
-        {t("auth.forgot")}
-      </button>
     </form>
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ next }: { next: string | null }) {
   const { t } = useTranslation();
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
@@ -264,7 +229,7 @@ function SignUpForm() {
         email: v.email,
         password: v.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
+          emailRedirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
           data: {
             full_name: v.full_name,
             phone: v.phone,

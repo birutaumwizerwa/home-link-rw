@@ -4,7 +4,9 @@ import type { Currency } from "@/lib/constants";
 export type SearchFilters = {
   q: string;
   listingType: "rent" | "sale" | null;
+  province: string | null;
   district: string | null;
+  sector: string | null;
   propertyType: string | null;
   minPrice: number | null;
   maxPrice: number | null;
@@ -21,7 +23,9 @@ export type SearchFilters = {
 export const EMPTY_FILTERS: SearchFilters = {
   q: "",
   listingType: null,
+  province: null,
   district: null,
+  sector: null,
   propertyType: null,
   minPrice: null,
   maxPrice: null,

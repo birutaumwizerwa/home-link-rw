@@ -3,7 +3,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "delete": "Delete",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "loading": "Loading"
   },
   "nav": {
     "home": "Home",
@@ -28,7 +29,9 @@
     "currency": "Currency",
     "main": "Main",
     "account": "Account",
-    "menu": "Menu"
+    "menu": "Menu",
+    "locations": "All locations",
+    "myHome": "My dashboard"
   },
   "price": {
     "perMonth": "/ month",
@@ -65,7 +68,9 @@
     "apartmentsCta": "See how it works",
     "movingTitle": "Moving to Rwanda?",
     "movingBody": "Leases, deposits, prepaid electricity and everyday life, explained for newcomers.",
-    "movingCta": "Read the guide"
+    "movingCta": "Read the guide",
+    "provincesTitle": "Browse by province",
+    "allDistricts": "All 30 districts"
   },
   "card": {
     "saved": "Saved",
@@ -419,7 +424,20 @@
     "expires": "expires {{date}}",
     "verifyTitle": "Get verified",
     "verifyBody": "Send us proof of identity on WhatsApp. Verified landlords show a badge and appear in the verified filter.",
-    "verifyCta": "Request verification"
+    "verifyCta": "Request verification",
+    "startVerify": "Request verification to earn the verified badge.",
+    "reviewNote_one": "{{count}} in review",
+    "reviewNote_other": "{{count}} in review",
+    "viewsPeriod": "Views, last {{days}} days",
+    "change": "{{value}} on the period before",
+    "rating": "Average rating",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
+    "viewsOverTime": "Listing views",
+    "days": "{{days}} days",
+    "noViews": "Views will appear here once renters open your listings.",
+    "topListings": "Most viewed",
+    "vacancy": "{{value}}% of your listed homes are vacant."
   },
   "auth": {
     "signInTitle": "Sign in",
@@ -451,11 +469,31 @@
     "roleClientBody": "Search, save and request viewings",
     "roleVendor": "Listing a property",
     "roleVendorBody": "Landlords, agencies and apartment operators",
-    "resetLinkInvalid": "This reset link has expired. Request a new one from the sign-in page.",
+    "resetLinkInvalid": "This reset link has expired or was already used. Request a new one.",
     "passwordUpdated": "Password updated",
     "newPasswordTitle": "Set a new password",
     "newPassword": "New password (8 characters or more)",
-    "savePassword": "Save password"
+    "savePassword": "Save password",
+    "panelTitle": "Every district. Every sector. One place to find home.",
+    "panelBody": "Search, book viewings and manage your homes from one account.",
+    "signInFailed": "That email and password do not match. Check them, or reset your password.",
+    "invalidEmail": "Enter a valid email address.",
+    "resetSentTo": "If {{email}} has an account, a password reset link is on its way.",
+    "useAnotherEmail": "Use another email",
+    "forgotTitle": "Forgot your password?",
+    "forgotBody": "Enter your email and we will send you a link to set a new one.",
+    "sendResetLink": "Send reset link",
+    "backToSignIn": "Back to sign in",
+    "linkExpiredTitle": "This link has expired",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "The passwords do not match.",
+    "strength0": "Too short",
+    "strength1": "Weak",
+    "strength2": "Fair",
+    "strength3": "Good",
+    "strength4": "Strong",
+    "suspendedTitle": "This account is suspended",
+    "suspendedBody": "Contact support on WhatsApp if you think this is a mistake."
   },
   "detail": {
     "contact": "Contact vendor",
@@ -529,5 +567,82 @@
     "verificationTitle": "Get your Verified badge",
     "verificationDesc": "Verified vendors get 3× more clicks and higher search ranking. Send your National ID to our WhatsApp.",
     "requestViaWhatsApp": "Request verification via WhatsApp"
+  },
+  "app": {
+    "overview": "Overview",
+    "adminArea": "Administration",
+    "propertyArea": "My properties",
+    "homeSearchArea": "Finding a home",
+    "myHomeSearch": "My home search",
+    "pendingListings": "Listings to approve",
+    "vendors": "Landlords",
+    "reports": "Reports",
+    "users": "Users",
+    "subscriptions": "Plans",
+    "rates": "Exchange rates",
+    "viewingRequests": "Viewing requests",
+    "businessProfile": "Business profile",
+    "backToSite": "Back to the website"
+  },
+  "notify": {
+    "title": "Notifications",
+    "markAll": "Mark all as read",
+    "empty": "You have no notifications yet.",
+    "viewing_requested": "New viewing request",
+    "viewing_confirmed": "Your viewing was confirmed",
+    "viewing_declined": "Your viewing was declined",
+    "viewing_cancelled": "A viewing was cancelled",
+    "listing_approved": "Your listing is live",
+    "new_message": "You have a new message",
+    "new_review": "You received a new review"
+  },
+  "account": {
+    "hello": "Hello, {{name}}",
+    "subtitle": "Here is where your home search stands.",
+    "upcoming": "Upcoming viewings",
+    "unread": "Unread messages",
+    "manageViewings": "Manage viewings",
+    "noViewingTitle": "No viewings booked yet",
+    "noViewingBody": "Open a home you like and choose Request a viewing.",
+    "suggested": "Homes you may like",
+    "suggestedIn": "More homes in {{district}}",
+    "recent": "Recently viewed",
+    "ownTitle": "Own a property?",
+    "ownBody": "List it on HomeLink and reach renters across Rwanda and abroad."
+  },
+  "chat": {
+    "sendFailed": "The message was not sent. Try again.",
+    "empty": "Your conversations with landlords will appear here.",
+    "noMessages": "No messages yet",
+    "select": "Choose a conversation",
+    "back": "Back to conversations",
+    "start": "Send the first message.",
+    "placeholder": "Write a message",
+    "send": "Send message"
+  },
+  "location": {
+    "province": "Province",
+    "cell": "Cell",
+    "chooseProvince": "Choose a province",
+    "chooseSector": "Choose a sector",
+    "chooseCell": "Choose a cell",
+    "allProvinces": "All provinces",
+    "allSectors": "All sectors",
+    "provinces": {
+      "kigali": "Kigali City",
+      "eastern": "Eastern Province",
+      "northern": "Northern Province",
+      "southern": "Southern Province",
+      "western": "Western Province"
+    },
+    "title": "Homes across Rwanda",
+    "subtitle": "Browse all 5 provinces, 30 districts and 416 sectors.",
+    "filter": "Find a district or sector",
+    "sectorCount_one": "{{count}} sector",
+    "sectorCount_other": "{{count}} sectors",
+    "districtCount_one": "{{count}} district",
+    "districtCount_other": "{{count}} districts",
+    "breadcrumb": "Location",
+    "allRwanda": "Rwanda"
   }
 }

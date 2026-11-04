@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { LocationSearch } from "@/components/location/LocationSearch";
 import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingGrid";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,8 +23,9 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { AMENITIES, BEDROOM_OPTIONS, DISTRICTS, PROPERTY_TYPES } from "@/lib/constants";
+import { AMENITIES, BEDROOM_OPTIONS, PROPERTY_TYPES } from "@/lib/constants";
 import { fetchListings, PAGE_SIZE } from "@/lib/listings-query";
+import { districtsOf, PROVINCES, sectorsOf } from "@/lib/rwanda-locations";
 import { EMPTY_FILTERS, type SearchFilters } from "@/store/app-store";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -31,7 +33,9 @@ const searchSchema = z.object({
   q: z.string().optional(),
   type: z.enum(["rent", "sale"]).optional(),
   property: z.string().optional(),
+  province: z.string().optional(),
   district: z.string().optional(),
+  sector: z.string().optional(),
   min: z.coerce.number().optional(),
   max: z.coerce.number().optional(),
   beds: z.coerce.number().optional(),
@@ -66,7 +70,9 @@ function toFilters(p: Params): SearchFilters {
     q: p.q ?? "",
     listingType: p.type ?? null,
     propertyType: p.property ?? null,
+    province: p.province ?? null,
     district: p.district ?? null,
+    sector: p.sector ?? null,
     minPrice: p.min ?? null,
     maxPrice: p.max ?? null,
     bedrooms: p.beds ?? null,
@@ -78,6 +84,39 @@ function toFilters(p: Params): SearchFilters {
     englishLease: !!p.english,
     sort: p.sort ?? "newest",
   };
+}
+
+function FilterSelect({
+  label,
+  value,
+  allLabel,
+  options,
+  onChange,
+}: {
+  label: string;
+  value?: string;
+  allLabel: string;
+  options: { value: string; label: string }[];
+  onChange: (v: string | undefined) => void;
+}) {
+  return (
+    <div>
+      <Label className="mb-1.5 block">{label}</Label>
+      <Select value={value ?? "all"} onValueChange={(v) => onChange(v === "all" ? undefined : v)}>
+        <SelectTrigger aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{allLabel}</SelectItem>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
 
 function FilterPanel({
@@ -147,25 +186,29 @@ function FilterPanel({
         />
       </div>
 
-      <div>
-        <Label className="mb-1.5 block">{t("search.district")}</Label>
-        <Select
-          value={params.district ?? "all"}
-          onValueChange={(v) => update({ district: v === "all" ? undefined : v })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("search.allDistricts")}</SelectItem>
-            {DISTRICTS.map((d) => (
-              <SelectItem key={d} value={d}>
-                {d}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterSelect
+        label={t("location.province")}
+        value={params.province}
+        allLabel={t("location.allProvinces")}
+        options={PROVINCES.map((p) => ({ value: p.id, label: t(`location.provinces.${p.id}`) }))}
+        onChange={(v) => update({ province: v, district: undefined, sector: undefined })}
+      />
+      <FilterSelect
+        label={t("search.district")}
+        value={params.district}
+        allLabel={t("search.allDistricts")}
+        options={districtsOf(params.province).map((d) => ({ value: d, label: d }))}
+        onChange={(v) => update({ district: v, sector: undefined })}
+      />
+      {params.district && (
+        <FilterSelect
+          label={t("form.sector")}
+          value={params.sector}
+          allLabel={t("location.allSectors")}
+          options={sectorsOf(params.district).map((s) => ({ value: s, label: s }))}
+          onChange={(v) => update({ sector: v })}
+        />
+      )}
 
       <div>
         <Label className="mb-1.5 block">{t("search.type")}</Label>
@@ -319,7 +362,7 @@ function SearchPage() {
       return;
     }
     const name =
-      [params.q, params.district, params.stay && t(`home.stay.${params.stay}`)]
+      [params.q, params.sector, params.district, params.stay && t(`home.stay.${params.stay}`)]
         .filter(Boolean)
         .join(", ") || t("search.allHomes");
     const { error } = await supabase
@@ -349,12 +392,18 @@ function SearchPage() {
           </aside>
           <section className="min-w-0">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row">
-              <Input
+              <LocationSearch
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                aria-label={t("home.searchPlaceholder")}
-                placeholder={t("home.searchPlaceholder")}
-                className="h-10 flex-1"
+                onChange={setText}
+                onPick={(p) => {
+                  setText("");
+                  update({
+                    q: undefined,
+                    province: undefined,
+                    district: p.district,
+                    sector: p.sector,
+                  });
+                }}
               />
               <div className="flex gap-2">
                 <Sheet>

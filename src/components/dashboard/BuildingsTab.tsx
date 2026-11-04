@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { LocationFields } from "@/components/location/LocationFields";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,17 +15,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { DISTRICTS } from "@/lib/constants";
 import type { ListingCardData } from "@/components/listings/ListingCard";
 
 type Draft = {
@@ -151,34 +144,10 @@ export function BuildingsTab({ listings }: { listings: ListingCardData[] }) {
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>{t("search.district")}</Label>
-                <Select
-                  value={draft.district}
-                  onValueChange={(v) => setDraft({ ...draft, district: v })}
-                >
-                  <SelectTrigger aria-label={t("search.district")}>
-                    <SelectValue placeholder={t("auth.selectDistrict")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DISTRICTS.map((d) => (
-                      <SelectItem key={d} value={d}>
-                        {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="bsector">{t("form.sector")}</Label>
-                <Input
-                  id="bsector"
-                  value={draft.sector}
-                  onChange={(e) => setDraft({ ...draft, sector: e.target.value })}
-                />
-              </div>
-            </div>
+            <LocationFields
+              value={{ district: draft.district, sector: draft.sector }}
+              onChange={(v) => setDraft({ ...draft, district: v.district, sector: v.sector })}
+            />
             <div>
               <Label htmlFor="bunits">{t("building.unitsField")}</Label>
               <Input

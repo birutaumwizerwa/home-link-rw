@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForApartmentsRouteImport } from './routes/for-apartments'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -22,10 +23,13 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NeighbourhoodsIndexRouteImport } from './routes/neighbourhoods.index'
+import { Route as LocationsIndexRouteImport } from './routes/locations.index'
 import { Route as VendorIdRouteImport } from './routes/vendor.$id'
 import { Route as NeighbourhoodsSlugRouteImport } from './routes/neighbourhoods.$slug'
+import { Route as LocationsDistrictRouteImport } from './routes/locations.$district'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as BuildingIdRouteImport } from './routes/building.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth_.callback'
 import { Route as AuthenticatedViewingsRouteImport } from './routes/_authenticated.viewings'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated.saved'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
@@ -33,6 +37,7 @@ import { Route as AuthenticatedPostListingRouteImport } from './routes/_authenti
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated.messages'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated.account'
 import { Route as AuthenticatedEditListingIdRouteImport } from './routes/_authenticated.edit-listing.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -63,6 +68,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForApartmentsRoute = ForApartmentsRouteImport.update({
@@ -99,6 +109,11 @@ const NeighbourhoodsIndexRoute = NeighbourhoodsIndexRouteImport.update({
   path: '/neighbourhoods/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsIndexRoute = LocationsIndexRouteImport.update({
+  id: '/locations/',
+  path: '/locations/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorIdRoute = VendorIdRouteImport.update({
   id: '/vendor/$id',
   path: '/vendor/$id',
@@ -109,6 +124,11 @@ const NeighbourhoodsSlugRoute = NeighbourhoodsSlugRouteImport.update({
   path: '/neighbourhoods/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsDistrictRoute = LocationsDistrictRouteImport.update({
+  id: '/locations/$district',
+  path: '/locations/$district',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
@@ -117,6 +137,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
 const BuildingIdRoute = BuildingIdRouteImport.update({
   id: '/building/$id',
   path: '/building/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth_/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedViewingsRoute = AuthenticatedViewingsRouteImport.update({
@@ -155,6 +180,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedEditListingIdRoute =
   AuthenticatedEditListingIdRouteImport.update({
     id: '/edit-listing/$id',
@@ -168,12 +198,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/for-apartments': typeof ForApartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guide': typeof GuideRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -181,10 +213,13 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/viewings': typeof AuthenticatedViewingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/locations/$district': typeof LocationsDistrictRoute
   '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/locations/': typeof LocationsIndexRoute
   '/neighbourhoods/': typeof NeighbourhoodsIndexRoute
   '/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
@@ -194,12 +229,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/for-apartments': typeof ForApartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guide': typeof GuideRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -207,10 +244,13 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/viewings': typeof AuthenticatedViewingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/locations/$district': typeof LocationsDistrictRoute
   '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/locations': typeof LocationsIndexRoute
   '/neighbourhoods': typeof NeighbourhoodsIndexRoute
   '/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
@@ -222,12 +262,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
   '/for-apartments': typeof ForApartmentsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guide': typeof GuideRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -235,10 +277,13 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/viewings': typeof AuthenticatedViewingsRoute
+  '/auth_/callback': typeof AuthCallbackRoute
   '/building/$id': typeof BuildingIdRoute
   '/listing/$id': typeof ListingIdRoute
+  '/locations/$district': typeof LocationsDistrictRoute
   '/neighbourhoods/$slug': typeof NeighbourhoodsSlugRoute
   '/vendor/$id': typeof VendorIdRoute
+  '/locations/': typeof LocationsIndexRoute
   '/neighbourhoods/': typeof NeighbourhoodsIndexRoute
   '/_authenticated/edit-listing/$id': typeof AuthenticatedEditListingIdRoute
 }
@@ -250,12 +295,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/for-apartments'
+    | '/forgot-password'
     | '/guide'
     | '/privacy'
     | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/account'
     | '/admin'
     | '/dashboard'
     | '/messages'
@@ -263,10 +310,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/saved'
     | '/viewings'
+    | '/auth/callback'
     | '/building/$id'
     | '/listing/$id'
+    | '/locations/$district'
     | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/locations/'
     | '/neighbourhoods/'
     | '/edit-listing/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -276,12 +326,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/for-apartments'
+    | '/forgot-password'
     | '/guide'
     | '/privacy'
     | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/account'
     | '/admin'
     | '/dashboard'
     | '/messages'
@@ -289,10 +341,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/saved'
     | '/viewings'
+    | '/auth/callback'
     | '/building/$id'
     | '/listing/$id'
+    | '/locations/$district'
     | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/locations'
     | '/neighbourhoods'
     | '/edit-listing/$id'
   id:
@@ -303,12 +358,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compare'
     | '/for-apartments'
+    | '/forgot-password'
     | '/guide'
     | '/privacy'
     | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
+    | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/messages'
@@ -316,10 +373,13 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/saved'
     | '/_authenticated/viewings'
+    | '/auth_/callback'
     | '/building/$id'
     | '/listing/$id'
+    | '/locations/$district'
     | '/neighbourhoods/$slug'
     | '/vendor/$id'
+    | '/locations/'
     | '/neighbourhoods/'
     | '/_authenticated/edit-listing/$id'
   fileRoutesById: FileRoutesById
@@ -331,16 +391,20 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
   ForApartmentsRoute: typeof ForApartmentsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuideRoute: typeof GuideRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   BuildingIdRoute: typeof BuildingIdRoute
   ListingIdRoute: typeof ListingIdRoute
+  LocationsDistrictRoute: typeof LocationsDistrictRoute
   NeighbourhoodsSlugRoute: typeof NeighbourhoodsSlugRoute
   VendorIdRoute: typeof VendorIdRoute
+  LocationsIndexRoute: typeof LocationsIndexRoute
   NeighbourhoodsIndexRoute: typeof NeighbourhoodsIndexRoute
 }
 
@@ -386,6 +450,13 @@ declare module '@tanstack/react-router' {
       path: '/guide'
       fullPath: '/guide'
       preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/for-apartments': {
@@ -437,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NeighbourhoodsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations/': {
+      id: '/locations/'
+      path: '/locations'
+      fullPath: '/locations/'
+      preLoaderRoute: typeof LocationsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor/$id': {
       id: '/vendor/$id'
       path: '/vendor/$id'
@@ -451,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NeighbourhoodsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations/$district': {
+      id: '/locations/$district'
+      path: '/locations/$district'
+      fullPath: '/locations/$district'
+      preLoaderRoute: typeof LocationsDistrictRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listing/$id': {
       id: '/listing/$id'
       path: '/listing/$id'
@@ -463,6 +548,13 @@ declare module '@tanstack/react-router' {
       path: '/building/$id'
       fullPath: '/building/$id'
       preLoaderRoute: typeof BuildingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth_/callback': {
+      id: '/auth_/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/viewings': {
@@ -514,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/edit-listing/$id': {
       id: '/_authenticated/edit-listing/$id'
       path: '/edit-listing/$id'
@@ -525,6 +624,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -536,6 +636,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
@@ -557,16 +658,20 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
   ForApartmentsRoute: ForApartmentsRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   GuideRoute: GuideRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   BuildingIdRoute: BuildingIdRoute,
   ListingIdRoute: ListingIdRoute,
+  LocationsDistrictRoute: LocationsDistrictRoute,
   NeighbourhoodsSlugRoute: NeighbourhoodsSlugRoute,
   VendorIdRoute: VendorIdRoute,
+  LocationsIndexRoute: LocationsIndexRoute,
   NeighbourhoodsIndexRoute: NeighbourhoodsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,11 +1,3 @@
-// ADMIN CREDENTIALS (platform owner)
-// Email: umwizerwaedvin@gmail.com
-// Password: Edvin@12345
-// The admin role is granted automatically on signup via a database trigger.
-// If needed manually, run in the backend SQL editor:
-// UPDATE user_roles SET role = 'admin'
-// WHERE user_id = (SELECT id FROM auth.users WHERE email = 'umwizerwaedvin@gmail.com');
-
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -13,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRef, useState } from "react";
 import { Camera, Loader2 } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -164,7 +154,6 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col pb-16 md:pb-0">
-      <Navbar />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="mb-6 text-3xl font-bold">{t("profile.title")}</h1>
 
@@ -324,7 +313,6 @@ function ProfilePage() {
           </Button>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

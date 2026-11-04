@@ -290,6 +290,31 @@ function ListingDetail() {
     <div className="flex min-h-screen flex-col pb-16 md:pb-0">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+        <nav aria-label={t("location.breadcrumb")} className="mb-3 text-sm text-muted-foreground">
+          <Link to="/locations" className="hover:text-primary">
+            {t("location.allRwanda")}
+          </Link>
+          {" / "}
+          <Link
+            to="/locations/$district"
+            params={{ district: l.district.toLowerCase() }}
+            className="hover:text-primary"
+          >
+            {l.district}
+          </Link>
+          {l.sector && (
+            <>
+              {" / "}
+              <Link
+                to="/search"
+                search={{ district: l.district, sector: l.sector }}
+                className="hover:text-primary"
+              >
+                {l.sector}
+              </Link>
+            </>
+          )}
+        </nav>
         {!l.is_approved && (
           <p className="mb-4 rounded-md border bg-card p-3 text-sm">{t("listing.pendingNotice")}</p>
         )}

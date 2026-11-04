@@ -154,3 +154,5 @@ h1, h2, h3, .font-display {
 @media (prefers-reduced-motion: reduce) {
   .imigongo-reveal { animation: none; }
 }
+
+.bg-ink :focus-visible { outline-color: var(--marigold); }

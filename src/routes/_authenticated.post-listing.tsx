@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Footer } from "@/components/Footer";
-import { Navbar } from "@/components/Navbar";
 import { ListingForm, type ExistingListing } from "@/components/listings/ListingForm";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -72,8 +70,7 @@ function PostListingPage() {
     vendor?.subscription_status === "free" && (vendor.free_posts_used ?? 0) >= FREE_POST_LIMIT;
 
   return (
-    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-      <Navbar />
+    <div className="flex flex-col">
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
         {!isVendor ? (
           <div className="rounded-lg border bg-card p-8 text-center">
@@ -109,7 +106,6 @@ function PostListingPage() {
           </>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

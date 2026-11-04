@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { BadgeCheck, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Footer } from "@/components/Footer";
-import { Navbar } from "@/components/Navbar";
+import { z } from "zod";
 import { ViewingList } from "@/components/booking/ViewingList";
 import { BuildingsTab } from "@/components/dashboard/BuildingsTab";
+import { OverviewTab } from "@/components/dashboard/OverviewTab";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,18 +28,10 @@ import { formatDate, formatPrice } from "@/lib/format";
 import { fetchListings } from "@/lib/listings-query";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  validateSearch: z.object({ tab: z.string().optional() }),
   head: () => ({ meta: [{ title: "Dashboard | HomeLink Rwanda" }] }),
   component: DashboardPage,
 });
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="bg-card p-4">
-      <div className="font-display text-3xl font-bold">{value.toLocaleString()}</div>
-      <div className="text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-}
 
 function BusinessProfile() {
   const { t } = useTranslation();
@@ -168,6 +160,8 @@ function BusinessProfile() {
 
 function DashboardPage() {
   const { t, i18n } = useTranslation();
+  const { tab = "overview" } = Route.useSearch();
+  const navigate = useNavigate({ from: "/dashboard" });
   const { user, isVendor } = useAuth();
   const qc = useQueryClient();
 
@@ -190,23 +184,10 @@ function DashboardPage() {
     enabled: !!user && isVendor,
     queryFn: () => fetchListings({ vendorId: user!.id, onlyApproved: false }),
   });
-  const { data: pendingViewings } = useQuery({
-    queryKey: ["viewings", "pending-count", user?.id],
-    enabled: !!user && isVendor,
-    queryFn: async () =>
-      (
-        await supabase
-          .from("viewing_requests")
-          .select("id", { count: "exact", head: true })
-          .eq("vendor_id", user!.id)
-          .eq("status", "pending")
-      ).count ?? 0,
-  });
 
   if (!isVendor) {
     return (
-      <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-        <Navbar />
+      <div className="flex flex-col">
         <main className="mx-auto max-w-xl flex-1 p-8 text-center">
           <h1 className="text-2xl font-bold">{t("post.listTitle")}</h1>
           <Button asChild className="mt-4">
@@ -220,9 +201,6 @@ function DashboardPage() {
   const all = listings ?? [];
   const free = vendor?.subscription_status === "free";
   const used = vendor?.free_posts_used ?? 0;
-  const live = all.filter((l) => l.is_approved && l.is_available).length;
-  const pending = all.filter((l) => !l.is_approved).length;
-  const views = all.reduce((s, l) => s + (l.views_count ?? 0), 0);
 
   const toggleAvailable = async (id: string, value: boolean) => {
     const { error } = await supabase.from("listings").update({ is_available: value }).eq("id", id);
@@ -244,37 +222,24 @@ function DashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-      <Navbar />
+    <div className="flex flex-col">
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-3xl font-bold">{t("nav.dashboard")}</h1>
-          <Button asChild>
+          <Button asChild className="sm:hidden">
             <Link to="/post-listing">
               <Plus className="h-4 w-4" /> {t("dash.newListing")}
             </Link>
           </Button>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border lg:grid-cols-4">
-          <Stat label={t("dash.live")} value={live} />
-          <Stat label={t("dash.inReview")} value={pending} />
-          <Stat label={t("dash.views")} value={views} />
-          <Stat label={t("dash.viewingRequests")} value={pendingViewings ?? 0} />
-        </div>
-
-        {!isLoading && (all.length === 0 || !vendor?.whatsapp_number) && (
-          <div className="mt-6 rounded-lg border bg-card p-5">
-            <h2 className="text-lg font-bold">{t("dash.startTitle")}</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
-              {!vendor?.whatsapp_number && <li>{t("dash.startWhatsapp")}</li>}
-              {all.length === 0 && <li>{t("dash.startListing", { count: FREE_POST_LIMIT })}</li>}
-            </ul>
-          </div>
-        )}
-
-        <Tabs defaultValue="listings" className="mt-8">
-          <TabsList className="flex h-auto w-full flex-wrap justify-start">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => navigate({ search: v === "overview" ? {} : { tab: v } })}
+          className="mt-6"
+        >
+          <TabsList className="flex h-auto w-full flex-wrap justify-start lg:hidden">
+            <TabsTrigger value="overview">{t("app.overview")}</TabsTrigger>
             <TabsTrigger value="listings">{t("dash.tabListings")}</TabsTrigger>
             <TabsTrigger value="buildings">{t("dash.tabBuildings")}</TabsTrigger>
             <TabsTrigger value="viewings">{t("dash.tabViewings")}</TabsTrigger>
@@ -282,6 +247,13 @@ function DashboardPage() {
             <TabsTrigger value="profile">{t("dash.tabProfile")}</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="overview">
+            <OverviewTab
+              listings={all}
+              whatsapp={!!vendor?.whatsapp_number}
+              verified={!!vendor?.is_verified}
+            />
+          </TabsContent>
           <TabsContent value="listings">
             {all.length === 0 ? (
               <div className="rounded-lg border border-dashed bg-card p-10 text-center text-muted-foreground">
@@ -427,7 +399,6 @@ function DashboardPage() {
           </TabsContent>
         </Tabs>
       </main>
-      <Footer />
     </div>
   );
 }

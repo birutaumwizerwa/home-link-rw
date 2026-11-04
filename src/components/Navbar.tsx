@@ -30,6 +30,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread";
 import { CURRENCIES, type Currency } from "@/lib/constants";
 import { initials } from "@/lib/format";
+import { homePath } from "@/lib/roles";
 import { useAppStore } from "@/store/app-store";
 
 const LANGUAGES = [
@@ -41,11 +42,12 @@ const LANGUAGES = [
 const PUBLIC_LINKS = [
   { to: "/search", key: "nav.search" },
   { to: "/neighbourhoods", key: "nav.neighbourhoods" },
+  { to: "/locations", key: "nav.locations" },
   { to: "/guide", key: "nav.guide" },
   { to: "/for-apartments", key: "nav.forApartments" },
 ] as const;
 
-function RegionMenu() {
+export function RegionMenu() {
   const { t, i18n } = useTranslation();
   const currency = useAppStore((s) => s.currency);
   const setCurrency = useAppStore((s) => s.setCurrency);
@@ -87,7 +89,7 @@ function RegionMenu() {
 
 export function Navbar() {
   const { t } = useTranslation();
-  const { isAuthenticated, isVendor, isAdmin, profile, signOut } = useAuth();
+  const { isAuthenticated, isVendor, isAdmin, profile, roles, signOut } = useAuth();
   const unread = useUnreadCount();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -131,68 +133,77 @@ export function Navbar() {
               </Button>
             </>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="px-1.5" aria-label={t("nav.account")}>
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt=""
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
-                      {initials(profile?.full_name)}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{profile?.full_name}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
-                  <User className="mr-2 h-4 w-4" /> {t("nav.editProfile")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate({ to: "/saved" })}>
-                  <Heart className="mr-2 h-4 w-4" /> {t("nav.saved")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate({ to: "/viewings" })}>
-                  <CalendarCheck className="mr-2 h-4 w-4" /> {t("nav.viewings")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
-                  <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
-                  {unread > 0 && (
-                    <span className="ml-auto rounded-full bg-destructive px-1.5 text-xs font-bold text-destructive-foreground">
-                      {unread > 9 ? "9+" : unread}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-                {isVendor && (
-                  <>
-                    <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" /> {t("nav.dashboard")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate({ to: "/post-listing" })}>
-                      <Plus className="mr-2 h-4 w-4" /> {t("nav.post")}
-                    </DropdownMenuItem>
-                  </>
-                )}
-                {isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
-                    <Shield className="mr-2 h-4 w-4" /> {t("nav.admin")}
+            <>
+              <Button
+                size="sm"
+                className="hidden sm:inline-flex"
+                onClick={() => navigate({ to: homePath(roles) })}
+              >
+                {t("nav.myHome")}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="px-1.5" aria-label={t("nav.account")}>
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt=""
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
+                        {initials(profile?.full_name)}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>{profile?.full_name}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                    <User className="mr-2 h-4 w-4" /> {t("nav.editProfile")}
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await signOut();
-                    navigate({ to: "/" });
-                  }}
-                >
-                  <LogOut className="mr-2 h-4 w-4" /> {t("nav.signOut")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/saved" })}>
+                    <Heart className="mr-2 h-4 w-4" /> {t("nav.saved")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/viewings" })}>
+                    <CalendarCheck className="mr-2 h-4 w-4" /> {t("nav.viewings")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/messages" })}>
+                    <MessageCircle className="mr-2 h-4 w-4" /> {t("nav.messages")}
+                    {unread > 0 && (
+                      <span className="ml-auto rounded-full bg-destructive px-1.5 text-xs font-bold text-destructive-foreground">
+                        {unread > 9 ? "9+" : unread}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                  {isVendor && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate({ to: "/dashboard" })}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" /> {t("nav.dashboard")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate({ to: "/post-listing" })}>
+                        <Plus className="mr-2 h-4 w-4" /> {t("nav.post")}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
+                      <Shield className="mr-2 h-4 w-4" /> {t("nav.admin")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await signOut();
+                      navigate({ to: "/" });
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" /> {t("nav.signOut")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           )}
 
           <Sheet open={open} onOpenChange={setOpen}>

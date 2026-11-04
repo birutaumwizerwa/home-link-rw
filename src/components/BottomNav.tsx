@@ -1,27 +1,24 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Home, Search, Heart, MessageCircle, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { homePath } from "@/lib/roles";
 import { useAuth } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-unread";
 
 export function BottomNav() {
   const { t } = useTranslation();
-  const { isAuthenticated, isVendor } = useAuth();
+  const { isAuthenticated, roles } = useAuth();
   const { pathname } = useLocation();
   const unread = useUnreadCount();
 
   const items = [
-    { to: "/", icon: Home, label: t("nav.home") },
+    { to: isAuthenticated ? homePath(roles) : "/", icon: Home, label: t("nav.home") },
     { to: "/search", icon: Search, label: t("nav.search") },
     ...(isAuthenticated
       ? [
           { to: "/saved", icon: Heart, label: t("nav.saved") },
           { to: "/messages", icon: MessageCircle, label: t("nav.messages"), badge: unread },
-          {
-            to: isVendor ? "/dashboard" : "/profile",
-            icon: User,
-            label: isVendor ? t("nav.dashboard") : t("nav.profile"),
-          },
+          { to: "/profile", icon: User, label: t("nav.profile") },
         ]
       : [{ to: "/auth", icon: User, label: t("nav.signIn") }]),
   ];

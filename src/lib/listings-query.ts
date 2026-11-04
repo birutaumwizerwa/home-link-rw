@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { ListingCardData } from "@/components/listings/ListingCard";
 import { STAY_OPTIONS } from "@/lib/constants";
+import { districtsOf } from "@/lib/rwanda-locations";
 import type { SearchFilters } from "@/store/app-store";
 
 export const LISTING_CARD_SELECT = `
@@ -52,6 +53,8 @@ export async function fetchListings(opts: {
     }
     if (f.listingType) q = q.eq("listing_type", f.listingType);
     if (f.district) q = q.eq("district", f.district);
+    else if (f.province) q = q.in("district", districtsOf(f.province));
+    if (f.sector) q = q.ilike("sector", safeTerm(f.sector));
     if (f.propertyType)
       q = q.eq(
         "property_type",

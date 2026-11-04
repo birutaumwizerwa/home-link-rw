@@ -3,7 +3,8 @@
     "cancel": "Hagarika",
     "close": "Funga",
     "delete": "Siba",
-    "tryAgain": "Ongera ugerageze"
+    "tryAgain": "Ongera ugerageze",
+    "loading": "Biratunganywa"
   },
   "nav": {
     "home": "Ahabanza",
@@ -28,7 +29,9 @@
     "currency": "Ifaranga",
     "main": "Iby'ingenzi",
     "account": "Konti",
-    "menu": "Menyu"
+    "menu": "Menyu",
+    "locations": "Ahantu hose",
+    "myHome": "Ibikubiyemo byanjye"
   },
   "price": {
     "perMonth": "/ ukwezi",
@@ -65,7 +68,9 @@
     "apartmentsCta": "Reba uko bikora",
     "movingTitle": "Urimukira mu Rwanda?",
     "movingBody": "Amasezerano, ingwate, umuriro wishyurwa mbere n'ubuzima bwa buri munsi.",
-    "movingCta": "Soma inyobozo"
+    "movingCta": "Soma inyobozo",
+    "provincesTitle": "Reba ku ntara",
+    "allDistricts": "Uturere 30 twose"
   },
   "card": {
     "saved": "Byabitswe",
@@ -419,7 +424,20 @@
     "expires": "irangira {{date}}",
     "verifyTitle": "Emezwa",
     "verifyBody": "Twoherereze indangamuntu kuri WhatsApp. Abemejwe bagaragaza ikimenyetso.",
-    "verifyCta": "Saba kwemezwa"
+    "verifyCta": "Saba kwemezwa",
+    "startVerify": "Saba kwemezwa ubone ikimenyetso.",
+    "reviewNote_one": "{{count}} irimo kugenzurwa",
+    "reviewNote_other": "{{count}} zirimo kugenzurwa",
+    "viewsPeriod": "Abarebye, iminsi {{days}}",
+    "change": "{{value}} ugereranyije n'igihe cyabanje",
+    "rating": "Amanota",
+    "reviewCount_one": "Igitekerezo {{count}}",
+    "reviewCount_other": "Ibitekerezo {{count}}",
+    "viewsOverTime": "Abarebye amazu",
+    "days": "Iminsi {{days}}",
+    "noViews": "Abarebye bazagaragara hano.",
+    "topListings": "Izarebwe cyane",
+    "vacancy": "{{value}}% by'amazu yawe arabona."
   },
   "auth": {
     "signInTitle": "Injira",
@@ -451,11 +469,31 @@
     "roleClientBody": "Shakisha, bika, saba gusura",
     "roleVendor": "Nshyiraho inzu",
     "roleVendorBody": "Ba nyir'amazu, ibigo n'abacunga inyubako",
-    "resetLinkInvalid": "Iri huza ryarangiye. Saba irindi.",
+    "resetLinkInvalid": "Iri huza ryarangiye cyangwa ryarakoreshejwe. Saba irindi.",
     "passwordUpdated": "Ijambo banga ryahinduwe",
     "newPasswordTitle": "Shyiraho ijambo banga rishya",
     "newPassword": "Ijambo banga rishya (nibura inyuguti 8)",
-    "savePassword": "Bika"
+    "savePassword": "Bika",
+    "panelTitle": "Uturere twose, imirenge yose, ahantu hamwe ho kubona inzu.",
+    "panelBody": "Shakisha, saba gusura kandi ucunge amazu kuri konti imwe.",
+    "signInFailed": "Imeyili n'ijambo banga ntibihura. Bigenzure cyangwa uhindure ijambo banga.",
+    "invalidEmail": "Andika imeyili nyayo.",
+    "resetSentTo": "Niba {{email}} ifite konti, ihuza riri mu nzira.",
+    "useAnotherEmail": "Koresha indi imeyili",
+    "forgotTitle": "Wibagiwe ijambo banga?",
+    "forgotBody": "Andika imeyili tukoherereze ihuza.",
+    "sendResetLink": "Ohereza ihuza",
+    "backToSignIn": "Subira ku kwinjira",
+    "linkExpiredTitle": "Iri huza ryarangiye",
+    "confirmPassword": "Emeza ijambo banga",
+    "passwordMismatch": "Amagambo banga ntahura.",
+    "strength0": "Ni rigufi cyane",
+    "strength1": "Ntirikomeye",
+    "strength2": "Riringaniye",
+    "strength3": "Ni ryiza",
+    "strength4": "Rirakomeye",
+    "suspendedTitle": "Iyi konti yahagaritswe",
+    "suspendedBody": "Vugana n'ubufasha kuri WhatsApp niba ari ikosa."
   },
   "detail": {
     "contact": "Vugana",
@@ -529,5 +567,82 @@
     "verificationTitle": "Bona ikimenyetso cyo kwemezwa",
     "verificationDesc": "Abacuruzi bemejwe baboneka kenshi.",
     "requestViaWhatsApp": "Saba kugenzurwa kuri WhatsApp"
+  },
+  "app": {
+    "overview": "Incamake",
+    "adminArea": "Ubuyobozi",
+    "propertyArea": "Amazu yanjye",
+    "homeSearchArea": "Gushaka inzu",
+    "myHomeSearch": "Gushaka kwanjye",
+    "pendingListings": "Izitegereje kwemezwa",
+    "vendors": "Ba nyir'amazu",
+    "reports": "Raporo",
+    "users": "Abakoresha",
+    "subscriptions": "Gahunda",
+    "rates": "Igipimo cy'ivunjisha",
+    "viewingRequests": "Ibisabwa byo gusura",
+    "businessProfile": "Umwirondoro w'ikigo",
+    "backToSite": "Subira ku rubuga"
+  },
+  "notify": {
+    "title": "Imenyesha",
+    "markAll": "Byose byasomwe",
+    "empty": "Nta menyesha ufite.",
+    "viewing_requested": "Gusaba gusura gushya",
+    "viewing_confirmed": "Gusura kwawe kwemejwe",
+    "viewing_declined": "Gusura kwawe kwanzwe",
+    "viewing_cancelled": "Gusura kwahagaritswe",
+    "listing_approved": "Inzu yawe iri ku rubuga",
+    "new_message": "Ufite ubutumwa bushya",
+    "new_review": "Wabonye igitekerezo gishya"
+  },
+  "account": {
+    "hello": "Muraho, {{name}}",
+    "subtitle": "Dore aho gushaka inzu kwawe bigeze.",
+    "upcoming": "Gusura guteganyijwe",
+    "unread": "Ubutumwa butasomwe",
+    "manageViewings": "Cunga gusura",
+    "noViewingTitle": "Nta gusura guteganyijwe",
+    "noViewingBody": "Fungura inzu ukunda, ukande Saba gusura.",
+    "suggested": "Amazu ushobora gukunda",
+    "suggestedIn": "Andi mazu i {{district}}",
+    "recent": "Waherutse kureba",
+    "ownTitle": "Ufite inzu?",
+    "ownBody": "Yishyire kuri HomeLink ugere ku bakodesha mu Rwanda no mu mahanga."
+  },
+  "chat": {
+    "sendFailed": "Ubutumwa ntibwoherejwe. Ongera ugerageze.",
+    "empty": "Ibiganiro byawe bizagaragara hano.",
+    "noMessages": "Nta butumwa buraboneka",
+    "select": "Hitamo ikiganiro",
+    "back": "Subira ku biganiro",
+    "start": "Ohereza ubutumwa bwa mbere.",
+    "placeholder": "Andika ubutumwa",
+    "send": "Ohereza"
+  },
+  "location": {
+    "province": "Intara",
+    "cell": "Akagari",
+    "chooseProvince": "Hitamo intara",
+    "chooseSector": "Hitamo umurenge",
+    "chooseCell": "Hitamo akagari",
+    "allProvinces": "Intara zose",
+    "allSectors": "Imirenge yose",
+    "provinces": {
+      "kigali": "Umujyi wa Kigali",
+      "eastern": "Intara y'Iburasirazuba",
+      "northern": "Intara y'Amajyaruguru",
+      "southern": "Intara y'Amajyepfo",
+      "western": "Intara y'Iburengerazuba"
+    },
+    "title": "Amazu mu Rwanda hose",
+    "subtitle": "Reba intara 5, uturere 30 n'imirenge 416.",
+    "filter": "Shaka akarere cyangwa umurenge",
+    "sectorCount_one": "Umurenge {{count}}",
+    "sectorCount_other": "Imirenge {{count}}",
+    "districtCount_one": "Akarere {{count}}",
+    "districtCount_other": "Uturere {{count}}",
+    "breadcrumb": "Aho iherereye",
+    "allRwanda": "U Rwanda"
   }
 }

@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { LocationFields } from "@/components/location/LocationFields";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,6 @@ import {
   AMENITIES,
   BATHROOM_OPTIONS,
   BEDROOM_OPTIONS,
-  DISTRICTS,
   LISTING_TYPES,
   PRICE_PERIODS,
   PROPERTY_TYPES,
@@ -236,7 +236,7 @@ export function ListingForm({
       toast.success(mode === "edit" ? t("form.saved") : t("form.submitted"));
       qc.invalidateQueries({ queryKey: ["my-listings"] });
       qc.invalidateQueries({ queryKey: ["vendor"] });
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/dashboard", search: { tab: "listings" } });
     } catch (e) {
       const message = (e as Error).message;
       toast.error(message.includes("limit") ? t("form.limitReached") : message);
@@ -390,24 +390,21 @@ export function ListingForm({
       )}
 
       <Section title={t("listing.location")}>
-        <Picker
-          label={t("search.district")}
-          value={watch("district")}
-          onChange={(v) => setValue("district", v, { shouldValidate: true })}
-          options={DISTRICTS.map((d) => ({ value: d, label: d }))}
-          placeholder={t("auth.selectDistrict")}
+        <LocationFields
+          withCell
+          error={!!err.district}
+          value={{
+            district: watch("district"),
+            sector: watch("sector") ?? "",
+            cell: watch("cell") ?? "",
+          }}
+          onChange={(v) => {
+            setValue("district", v.district, { shouldValidate: true });
+            setValue("sector", v.sector);
+            setValue("cell", v.cell ?? "");
+          }}
         />
         {err.district && <p className="text-sm text-destructive">{t("form.districtError")}</p>}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label htmlFor="sector">{t("form.sector")}</Label>
-            <Input id="sector" {...register("sector")} />
-          </div>
-          <div>
-            <Label htmlFor="cell">{t("form.cell")}</Label>
-            <Input id="cell" {...register("cell")} />
-          </div>
-        </div>
       </Section>
 
       <Section title={t("listing.amenities")}>

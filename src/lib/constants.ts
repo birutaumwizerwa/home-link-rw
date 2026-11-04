@@ -1,40 +1,6 @@
-export const DISTRICTS = [
-  // Kigali
-  "Gasabo",
-  "Kicukiro",
-  "Nyarugenge",
-  // Eastern
-  "Bugesera",
-  "Gatsibo",
-  "Kayonza",
-  "Kirehe",
-  "Ngoma",
-  "Nyagatare",
-  "Rwamagana",
-  // Northern
-  "Burera",
-  "Gakenke",
-  "Gicumbi",
-  "Musanze",
-  "Rulindo",
-  // Southern
-  "Gisagara",
-  "Huye",
-  "Kamonyi",
-  "Muhanga",
-  "Nyamagabe",
-  "Nyanza",
-  "Nyaruguru",
-  "Ruhango",
-  // Western
-  "Karongi",
-  "Ngororero",
-  "Nyabihu",
-  "Nyamasheke",
-  "Rubavu",
-  "Rutsiro",
-  "Rusizi",
-] as const;
+import { ALL_DISTRICTS } from "@/lib/rwanda-locations";
+
+export const DISTRICTS = ALL_DISTRICTS;
 
 export const PROPERTY_TYPES = [
   { value: "house", label: "House" },

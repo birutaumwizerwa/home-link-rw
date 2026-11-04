@@ -2,14 +2,15 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Building2, CalendarCheck, Globe2, Search, ShieldCheck } from "lucide-react";
+import { Building2, CalendarCheck, Globe2, ShieldCheck } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { ImigongoBand, ImigongoPanel } from "@/components/brand/Imigongo";
 import { ListingGrid, ListingGridSkeleton } from "@/components/listings/ListingGrid";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { LocationSearch } from "@/components/location/LocationSearch";
 import { fetchListings } from "@/lib/listings-query";
+import { PROVINCES } from "@/lib/rwanda-locations";
 import { NEIGHBOURHOODS, neighbourhoodText } from "@/lib/neighbourhoods";
 
 export const Route = createFileRoute("/")({
@@ -94,16 +95,20 @@ function Index() {
                 </div>
               </fieldset>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    aria-label={t("home.searchPlaceholder")}
-                    placeholder={t("home.searchPlaceholder")}
-                    className="h-11 pl-9"
-                  />
-                </div>
+                <LocationSearch
+                  value={q}
+                  onChange={setQ}
+                  onPick={(p) =>
+                    navigate({
+                      to: "/search",
+                      search: {
+                        district: p.district,
+                        sector: p.sector,
+                        ...(stay === "buy" ? { type: "sale" as const } : { stay }),
+                      },
+                    })
+                  }
+                />
                 <Button type="submit" className="h-11 px-8">
                   {t("home.searchBtn")}
                 </Button>
@@ -154,6 +159,35 @@ function Index() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="mt-12">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <h2 className="text-3xl font-bold">{t("home.provincesTitle")}</h2>
+            <Link
+              to="/locations"
+              className="shrink-0 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("home.allDistricts")}
+            </Link>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 lg:grid-cols-5">
+            {PROVINCES.map((p) => (
+              <Link
+                key={p.id}
+                to="/search"
+                search={{ province: p.id }}
+                className="bg-card p-4 hover:bg-accent"
+              >
+                <span className="block font-display text-lg font-bold leading-tight">
+                  {t(`location.provinces.${p.id}`)}
+                </span>
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  {t("location.districtCount", { count: p.districts.length })}
+                </span>
+              </Link>
+            ))}
+          </div>
         </section>
 
         {features && (

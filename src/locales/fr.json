@@ -3,7 +3,8 @@
     "cancel": "Annuler",
     "close": "Fermer",
     "delete": "Supprimer",
-    "tryAgain": "Réessayer"
+    "tryAgain": "Réessayer",
+    "loading": "Chargement"
   },
   "nav": {
     "home": "Accueil",
@@ -28,7 +29,9 @@
     "currency": "Devise",
     "main": "Principal",
     "account": "Compte",
-    "menu": "Menu"
+    "menu": "Menu",
+    "locations": "Tous les lieux",
+    "myHome": "Mon espace"
   },
   "price": {
     "perMonth": "/ mois",
@@ -65,7 +68,9 @@
     "apartmentsCta": "Voir comment ça marche",
     "movingTitle": "Vous vous installez au Rwanda ?",
     "movingBody": "Baux, cautions, électricité prépayée et vie quotidienne, expliqués simplement.",
-    "movingCta": "Lire le guide"
+    "movingCta": "Lire le guide",
+    "provincesTitle": "Parcourir par province",
+    "allDistricts": "Les 30 districts"
   },
   "card": {
     "saved": "Enregistré",
@@ -419,7 +424,20 @@
     "expires": "expire le {{date}}",
     "verifyTitle": "Faites-vous vérifier",
     "verifyBody": "Envoyez-nous une pièce d'identité sur WhatsApp. Les propriétaires vérifiés affichent un badge.",
-    "verifyCta": "Demander la vérification"
+    "verifyCta": "Demander la vérification",
+    "startVerify": "Demandez la vérification pour obtenir le badge.",
+    "reviewNote_one": "{{count}} en vérification",
+    "reviewNote_other": "{{count}} en vérification",
+    "viewsPeriod": "Vues, {{days}} derniers jours",
+    "change": "{{value}} sur la période précédente",
+    "rating": "Note moyenne",
+    "reviewCount_one": "{{count}} avis",
+    "reviewCount_other": "{{count}} avis",
+    "viewsOverTime": "Vues des annonces",
+    "days": "{{days}} jours",
+    "noViews": "Les vues apparaîtront ici dès que des locataires ouvriront vos annonces.",
+    "topListings": "Les plus vues",
+    "vacancy": "{{value}} % de vos logements sont vacants."
   },
   "auth": {
     "signInTitle": "Connexion",
@@ -451,11 +469,31 @@
     "roleClientBody": "Chercher, enregistrer, demander des visites",
     "roleVendor": "Je publie un bien",
     "roleVendorBody": "Propriétaires, agences et gestionnaires",
-    "resetLinkInvalid": "Ce lien a expiré. Demandez-en un nouveau depuis la connexion.",
+    "resetLinkInvalid": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
     "passwordUpdated": "Mot de passe modifié",
     "newPasswordTitle": "Nouveau mot de passe",
     "newPassword": "Nouveau mot de passe (8 caractères ou plus)",
-    "savePassword": "Enregistrer"
+    "savePassword": "Enregistrer",
+    "panelTitle": "Chaque district, chaque secteur, un seul endroit pour trouver votre logement.",
+    "panelBody": "Cherchez, réservez des visites et gérez vos logements depuis un seul compte.",
+    "signInFailed": "L'e-mail et le mot de passe ne correspondent pas. Vérifiez-les ou réinitialisez votre mot de passe.",
+    "invalidEmail": "Saisissez une adresse e-mail valide.",
+    "resetSentTo": "Si {{email}} a un compte, un lien de réinitialisation arrive.",
+    "useAnotherEmail": "Utiliser un autre e-mail",
+    "forgotTitle": "Mot de passe oublié ?",
+    "forgotBody": "Saisissez votre e-mail et nous vous enverrons un lien.",
+    "sendResetLink": "Envoyer le lien",
+    "backToSignIn": "Retour à la connexion",
+    "linkExpiredTitle": "Ce lien a expiré",
+    "confirmPassword": "Confirmez le mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "strength0": "Trop court",
+    "strength1": "Faible",
+    "strength2": "Moyen",
+    "strength3": "Bon",
+    "strength4": "Fort",
+    "suspendedTitle": "Ce compte est suspendu",
+    "suspendedBody": "Contactez l'assistance sur WhatsApp si vous pensez qu'il s'agit d'une erreur."
   },
   "detail": {
     "contact": "Contacter",
@@ -529,5 +567,82 @@
     "verificationTitle": "Obtenez le badge vérifié",
     "verificationDesc": "Les vendeurs vérifiés obtiennent plus de clics.",
     "requestViaWhatsApp": "Demander la vérification via WhatsApp"
+  },
+  "app": {
+    "overview": "Vue d'ensemble",
+    "adminArea": "Administration",
+    "propertyArea": "Mes biens",
+    "homeSearchArea": "Recherche de logement",
+    "myHomeSearch": "Ma recherche",
+    "pendingListings": "Annonces à approuver",
+    "vendors": "Propriétaires",
+    "reports": "Signalements",
+    "users": "Utilisateurs",
+    "subscriptions": "Offres",
+    "rates": "Taux de change",
+    "viewingRequests": "Demandes de visite",
+    "businessProfile": "Profil professionnel",
+    "backToSite": "Retour au site"
+  },
+  "notify": {
+    "title": "Notifications",
+    "markAll": "Tout marquer comme lu",
+    "empty": "Aucune notification pour le moment.",
+    "viewing_requested": "Nouvelle demande de visite",
+    "viewing_confirmed": "Votre visite est confirmée",
+    "viewing_declined": "Votre visite a été refusée",
+    "viewing_cancelled": "Une visite a été annulée",
+    "listing_approved": "Votre annonce est en ligne",
+    "new_message": "Vous avez un nouveau message",
+    "new_review": "Vous avez reçu un nouvel avis"
+  },
+  "account": {
+    "hello": "Bonjour {{name}}",
+    "subtitle": "Voici où en est votre recherche.",
+    "upcoming": "Visites à venir",
+    "unread": "Messages non lus",
+    "manageViewings": "Gérer les visites",
+    "noViewingTitle": "Aucune visite prévue",
+    "noViewingBody": "Ouvrez un logement et choisissez Demander une visite.",
+    "suggested": "Logements pour vous",
+    "suggestedIn": "Plus de logements à {{district}}",
+    "recent": "Vus récemment",
+    "ownTitle": "Vous avez un bien ?",
+    "ownBody": "Publiez-le sur HomeLink et touchez des locataires au Rwanda et à l'étranger."
+  },
+  "chat": {
+    "sendFailed": "Le message n'a pas été envoyé. Réessayez.",
+    "empty": "Vos échanges avec les propriétaires apparaîtront ici.",
+    "noMessages": "Pas encore de message",
+    "select": "Choisissez une conversation",
+    "back": "Retour aux conversations",
+    "start": "Envoyez le premier message.",
+    "placeholder": "Écrire un message",
+    "send": "Envoyer le message"
+  },
+  "location": {
+    "province": "Province",
+    "cell": "Cellule",
+    "chooseProvince": "Choisissez une province",
+    "chooseSector": "Choisissez un secteur",
+    "chooseCell": "Choisissez une cellule",
+    "allProvinces": "Toutes les provinces",
+    "allSectors": "Tous les secteurs",
+    "provinces": {
+      "kigali": "Ville de Kigali",
+      "eastern": "Province de l'Est",
+      "northern": "Province du Nord",
+      "southern": "Province du Sud",
+      "western": "Province de l'Ouest"
+    },
+    "title": "Logements partout au Rwanda",
+    "subtitle": "Parcourez les 5 provinces, 30 districts et 416 secteurs.",
+    "filter": "Trouver un district ou un secteur",
+    "sectorCount_one": "{{count}} secteur",
+    "sectorCount_other": "{{count}} secteurs",
+    "districtCount_one": "{{count}} district",
+    "districtCount_other": "{{count}} districts",
+    "breadcrumb": "Emplacement",
+    "allRwanda": "Rwanda"
   }
 }

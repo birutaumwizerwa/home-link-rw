@@ -173,6 +173,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: string;
+          subject: string | null;
+          link: string;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          kind: string;
+          subject?: string | null;
+          link?: string;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: { read_at?: string | null };
+        Relationships: [];
+      };
+      listing_view_days: {
+        Row: { listing_id: string; day: string; views: number };
+        Insert: { listing_id: string; day?: string; views?: number };
+        Update: { views?: number };
+        Relationships: [];
+      };
       chats: {
         Row: {
           client_id: string;
@@ -668,6 +696,7 @@ export type Database = {
       };
     };
     Functions: {
+      mark_chat_read: { Args: { _chat_id: string }; Returns: undefined };
       become_vendor: { Args: Record<string, never>; Returns: undefined };
       record_listing_view: { Args: { _listing_id: string }; Returns: undefined };
       can_review_vendor: { Args: { _vendor_id: string }; Returns: boolean };

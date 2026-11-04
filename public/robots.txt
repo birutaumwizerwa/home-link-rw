@@ -5,6 +5,10 @@ Disallow: /dashboard
 Disallow: /messages
 Disallow: /saved
 Disallow: /viewings
+Disallow: /account
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /forgot-password
 Disallow: /profile
 
 Sitemap: https://homelink.rw/sitemap.xml

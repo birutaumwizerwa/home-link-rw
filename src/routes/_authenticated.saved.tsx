@@ -2,8 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react";
-import { Footer } from "@/components/Footer";
-import { Navbar } from "@/components/Navbar";
 import { ListingGrid } from "@/components/listings/ListingGrid";
 import type { ListingCardData } from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/button";
@@ -49,8 +47,7 @@ function SavedPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-      <Navbar />
+    <div className="flex flex-col">
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="mb-6 text-3xl font-bold">{t("nav.saved")}</h1>
         {searches && searches.length > 0 && (
@@ -86,7 +83,6 @@ function SavedPage() {
           <ListingGrid listings={data ?? []} empty={t("saved.empty")} />
         )}
       </main>
-      <Footer />
     </div>
   );
 }

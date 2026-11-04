@@ -1,8 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -26,57 +24,54 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { z } from "zod";
+import { AdminCharts } from "@/components/dashboard/AdminOverview";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  validateSearch: z.object({ tab: z.string().optional() }),
   head: () => ({ meta: [{ title: "Admin Dashboard — HomeLink Rwanda" }] }),
   component: AdminPage,
 });
 
 function AdminPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, rolesLoaded } = useAuth();
   const navigate = useNavigate();
+  const { tab = "overview" } = Route.useSearch();
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate({ to: "/" });
-  }, [loading, isAdmin, navigate]);
+    if (!loading && rolesLoaded && !isAdmin) navigate({ to: "/account" });
+  }, [loading, rolesLoaded, isAdmin, navigate]);
 
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
-      <Navbar />
+    <div className="flex flex-col">
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
         {/* Header with View Site button */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-1 text-xs font-medium text-green-700 dark:text-green-400">
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                Live
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage listings, vendors, users, and platform settings
-            </p>
-          </div>
+          <h1 className="text-3xl font-bold">Admin</h1>
 
           {/* View Site Button - Option to see the live website */}
           <Button variant="outline" asChild className="gap-2">
             <Link to="/">
-              <ExternalLink className="h-4 w-4" />
-              View live site
-              <span className="text-xs text-muted-foreground ml-1">(browse as visitor)</span>
+              <ExternalLink className="h-4 w-4" /> View site
             </Link>
           </Button>
         </div>
 
         {/* Stats Grid */}
-        <StatsGrid />
+        {tab === "overview" && <StatsGrid />}
+        {tab === "overview" && <AdminCharts />}
 
         {/* Main Tabs */}
-        <Tabs defaultValue="overview" className="mt-8">
-          <TabsList className="flex flex-wrap h-auto gap-1">
+        <Tabs
+          value={tab}
+          onValueChange={(v) =>
+            navigate({ to: "/admin", search: v === "overview" ? {} : { tab: v } })
+          }
+          className="mt-6"
+        >
+          <TabsList className="flex flex-wrap h-auto gap-1 lg:hidden">
             <TabsTrigger value="overview">
               <LayoutDashboard className="h-4 w-4 mr-1.5" /> Overview
             </TabsTrigger>
@@ -123,7 +118,6 @@ function AdminPage() {
           </TabsContent>
         </Tabs>
       </main>
-      <Footer />
     </div>
   );
 }
@@ -190,102 +184,28 @@ function useAdminStats() {
 }
 
 function StatsGrid() {
-  const { data: s, isLoading } = useAdminStats();
-
+  const { data: s } = useAdminStats();
   const stats = [
-    {
-      label: "Total Listings",
-      value: s?.listings ?? 0,
-      icon: Home,
-      color: "bg-blue-500",
-      bgColor: "bg-blue-50 dark:bg-blue-950/30",
-      textColor: "text-blue-600",
-    },
-    {
-      label: "Total Users",
-      value: s?.users ?? 0,
-      icon: UsersIcon,
-      color: "bg-green-500",
-      bgColor: "bg-green-50 dark:bg-green-950/30",
-      textColor: "text-green-600",
-    },
-    {
-      label: "Vendors",
-      value: s?.vendors ?? 0,
-      icon: Building2,
-      color: "bg-purple-500",
-      bgColor: "bg-purple-50 dark:bg-purple-950/30",
-      textColor: "text-purple-600",
-    },
-    {
-      label: "Pending Approval",
-      value: s?.pending ?? 0,
-      icon: Clock,
-      color: "bg-yellow-500",
-      bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
-      textColor: "text-yellow-600",
-      alert: (s?.pending ?? 0) > 0,
-    },
-    {
-      label: "Open Reports",
-      value: s?.reports ?? 0,
-      icon: AlertTriangle,
-      color: "bg-red-500",
-      bgColor: "bg-red-50 dark:bg-red-950/30",
-      textColor: "text-red-600",
-      alert: (s?.reports ?? 0) > 0,
-    },
-    {
-      label: "Active Subs",
-      value: s?.activeSubs ?? 0,
-      icon: DollarSign,
-      color: "bg-emerald-500",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-      textColor: "text-emerald-600",
-    },
-    {
-      label: "Revenue (MTD)",
-      value: `${(s?.totalRevenue ?? 0).toLocaleString()} RWF`,
-      icon: TrendingUp,
-      color: "bg-amber-500",
-      bgColor: "bg-amber-50 dark:bg-amber-950/30",
-      textColor: "text-amber-600",
-    },
-    {
-      label: "Engagement",
-      value: `${s?.users ? Math.round(((s?.listings ?? 0) / (s?.users ?? 1)) * 10) / 10 : 0} listings/user`,
-      icon: MessageCircle,
-      color: "bg-indigo-500",
-      bgColor: "bg-indigo-50 dark:bg-indigo-950/30",
-      textColor: "text-indigo-600",
-    },
+    { label: "Listings", value: s?.listings ?? 0 },
+    { label: "Awaiting approval", value: s?.pending ?? 0, tab: "pending" },
+    { label: "Open reports", value: s?.reports ?? 0, tab: "reports" },
+    { label: "Users", value: s?.users ?? 0, tab: "users" },
+    { label: "Vendors", value: s?.vendors ?? 0, tab: "vendors" },
+    { label: "Active plans", value: s?.activeSubs ?? 0, tab: "subscriptions" },
+    { label: "Active plan value (RWF)", value: s?.totalRevenue ?? 0, tab: "subscriptions" },
   ];
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="animate-pulse rounded-xl bg-gray-200 dark:bg-gray-800 h-24" />
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-      {stats.map((stat) => (
-        <div
-          key={stat.label}
-          className={`rounded-xl border p-3 transition-all hover:shadow-md ${stat.alert ? "border-red-300 bg-red-50/50 dark:bg-red-950/20" : "bg-card"}`}
+    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-4 xl:grid-cols-7">
+      {stats.map((x) => (
+        <Link
+          key={x.label}
+          to="/admin"
+          search={(x.tab ? { tab: x.tab } : {}) as never}
+          className="bg-card p-4 hover:bg-muted"
         >
-          <div className={`rounded-lg p-1.5 w-fit ${stat.bgColor}`}>
-            <stat.icon className={`h-4 w-4 ${stat.textColor}`} />
-          </div>
-          <div className="mt-2">
-            <div className="text-xl font-bold">{stat.value?.toLocaleString() ?? "—"}</div>
-            <div className="text-xs text-muted-foreground">{stat.label}</div>
-          </div>
-        </div>
+          <span className="block font-display text-2xl font-bold">{x.value.toLocaleString()}</span>
+          <span className="text-sm text-muted-foreground">{x.label}</span>
+        </Link>
       ))}
     </div>
   );

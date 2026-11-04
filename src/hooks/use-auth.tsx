@@ -19,6 +19,7 @@ type AuthCtx = {
   profile: Profile | null;
   roles: AppRole[];
   loading: boolean;
+  rolesLoaded: boolean;
   isAuthenticated: boolean;
   isVendor: boolean;
   isAdmin: boolean;
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [roles, setRoles] = React.useState<AppRole[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [rolesLoaded, setRolesLoaded] = React.useState(false);
 
   const loadAux = React.useCallback(async (userId: string) => {
     const [{ data: p }, { data: r }] = await Promise.all([
@@ -41,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
     setProfile(((p as Profile[] | null) ?? [])[0] ?? null);
+    setRolesLoaded(true);
     setRoles(((r as { role: AppRole }[] | null) ?? []).map((x) => x.role));
   }, []);
 
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setProfile(null);
         setRoles([]);
+        setRolesLoaded(false);
       }
     });
 
@@ -76,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     profile,
     roles,
     loading,
+    rolesLoaded,
     isAuthenticated: !!user,
     isVendor: roles.includes("vendor"),
     isAdmin: roles.includes("admin"),

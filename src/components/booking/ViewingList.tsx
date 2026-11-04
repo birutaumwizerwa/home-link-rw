@@ -29,7 +29,7 @@ const STATUS_CLASS: Record<string, string> = {
   cancelled: "bg-muted text-muted-foreground",
 };
 
-export function ViewingList({ as }: { as: "client" | "vendor" }) {
+export function ViewingList({ as, limit }: { as: "client" | "vendor"; limit?: number }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -68,7 +68,7 @@ export function ViewingList({ as }: { as: "client" | "vendor" }) {
 
   return (
     <ul className="divide-y rounded-lg border bg-card">
-      {data.map((v) => (
+      {(limit ? data.slice(0, limit) : data).map((v) => (
         <li
           key={v.id}
           className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"

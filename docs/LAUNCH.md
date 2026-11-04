@@ -1,7 +1,11 @@
 # HomeLink Rwanda launch checklist
 
 ## 1. Update the database
-Run `supabase/migrations/20261102120000_market_ready.sql` before deploying the new code, because the app depends on it.
+Run these two files in order before deploying the new code, because the app depends on them:
+
+1. `supabase/migrations/20261102120000_market_ready.sql` (skip it if you have already run it)
+2. `supabase/migrations/20261104120000_dashboards.sql`
+
 Back up the database first (Supabase dashboard > Database > Backups), then either run `supabase db push`
 or paste the file into the Supabase SQL editor.
 
@@ -13,10 +17,11 @@ or paste the file into the Supabase SQL editor.
 
 ## 3. Configure Supabase Auth
 In Authentication > URL Configuration, set the Site URL to your domain and add
-`https://YOUR-DOMAIN/reset-password` and `https://YOUR-DOMAIN/auth` to the redirect URLs.
+`https://YOUR-DOMAIN/reset-password` and `https://YOUR-DOMAIN/auth/callback` to the redirect URLs.
 Add a custom SMTP provider so confirmation and reset emails are delivered reliably.
 
 ## 4. Before going public
+- Change the admin password. An old version of the code contained it, and the repository is public.
 - Set real rates in Admin > Exchange rates. The starting values are estimates.
 - Update `public/robots.txt` if the domain is not homelink.rw.
 - Confirm `CONTACT_EMAIL` and the support WhatsApp number in `src/lib/constants.ts`.
