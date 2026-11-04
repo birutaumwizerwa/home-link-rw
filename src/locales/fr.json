@@ -340,7 +340,7 @@
     "seePlans": "Voir les offres"
   },
   "form": {
-    "photoRejected": "Certaines photos ont été ignorées. Utilisez JPG, PNG ou WebP de moins de 5 Mo.",
+    "photoRejected": "Certaines photos ont été ignorées. Utilisez JPG, PNG ou WebP de moins de 25 Mo.",
     "saved": "Modifications enregistrées",
     "submitted": "Annonce envoyée pour vérification. Elle apparaîtra après approbation.",
     "limitReached": "Vous avez atteint la limite de votre offre.",
@@ -368,8 +368,8 @@
     "cell": "Cellule ou quartier",
     "descriptionHint": "Décrivez le logement et le quartier. Les numéros de téléphone sont retirés automatiquement.",
     "photos": "Photos",
-    "photoHint_one": "Jusqu'à {{count}} photo.",
-    "photoHint_other": "Jusqu'à {{count}} photos. JPG, PNG ou WebP de moins de 5 Mo.",
+    "photoHint_one": "Jusqu'à {{count}} photo. Nous la compressons pour vous.",
+    "photoHint_other": "Jusqu'à {{count}} photos, JPG, PNG ou WebP. Nous les compressons pour vous.",
     "cover": "Couverture",
     "removePhoto": "Retirer la photo",
     "videoTour": "Visite vidéo",
@@ -380,7 +380,9 @@
     "saving": "Enregistrement",
     "saveChanges": "Enregistrer",
     "publish": "Envoyer pour vérification",
-    "editTitle": "Modifier l'annonce"
+    "editTitle": "Modifier l'annonce",
+    "compressing": "Préparation de la photo {{current}} sur {{total}}",
+    "compressed": "Photos réduites de {{before}} à {{after}}"
   },
   "dash": {
     "businessName": "Nom de l'entreprise ou agence",
@@ -551,7 +553,7 @@
     "saving": "Enregistrement...",
     "saved": "Profil mis à jour",
     "avatarTitle": "Photo de profil",
-    "avatarHint": "JPG, PNG ou WebP · Max 3 Mo",
+    "avatarHint": "JPG, PNG ou WebP. Nous la compressons pour vous.",
     "removePhoto": "Supprimer la photo",
     "changePhoto": "Changer la photo",
     "passwordTitle": "Mot de passe",

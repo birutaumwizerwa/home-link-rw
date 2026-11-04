@@ -340,7 +340,7 @@
     "seePlans": "Reba gahunda"
   },
   "form": {
-    "photoRejected": "Amafoto amwe yanzwe. Koresha JPG, PNG cyangwa WebP munsi ya 5 MB.",
+    "photoRejected": "Amafoto amwe yanzwe. Koresha JPG, PNG cyangwa WebP munsi ya 25 MB.",
     "saved": "Impinduka zabitswe",
     "submitted": "Inzu yoherejwe kugenzurwa. Izagaragara imaze kwemezwa.",
     "limitReached": "Wageze ku mubare ntarengwa.",
@@ -368,8 +368,8 @@
     "cell": "Akagari cyangwa agace",
     "descriptionHint": "Sobanura inzu n'agace. Nimero za telefone zikurwamo.",
     "photos": "Amafoto",
-    "photoHint_one": "Ifoto {{count}}.",
-    "photoHint_other": "Amafoto agera kuri {{count}}. JPG, PNG cyangwa WebP munsi ya 5 MB.",
+    "photoHint_one": "Ifoto {{count}}. Turayigabanya ingano.",
+    "photoHint_other": "Amafoto agera kuri {{count}}, JPG, PNG cyangwa WebP. Turayagabanya ingano.",
     "cover": "Ifoto nkuru",
     "removePhoto": "Kuramo ifoto",
     "videoTour": "Videwo y'inzu",
@@ -380,7 +380,9 @@
     "saving": "Birabikwa",
     "saveChanges": "Bika impinduka",
     "publish": "Ohereza kugenzurwa",
-    "editTitle": "Hindura inzu"
+    "editTitle": "Hindura inzu",
+    "compressing": "Gutegura ifoto {{current}} kuri {{total}}",
+    "compressed": "Amafoto yavuye kuri {{before}} agera kuri {{after}}"
   },
   "dash": {
     "businessName": "Izina ry'ikigo",
@@ -551,7 +553,7 @@
     "saving": "Birabikwa...",
     "saved": "Profile yahindutse",
     "avatarTitle": "Ifoto ya profile",
-    "avatarHint": "JPG, PNG cyangwa WebP · Ntirenze 3MB",
+    "avatarHint": "JPG, PNG cyangwa WebP. Turayigabanya ingano.",
     "removePhoto": "Kuraho ifoto",
     "changePhoto": "Hindura ifoto",
     "passwordTitle": "Ijambobanga",

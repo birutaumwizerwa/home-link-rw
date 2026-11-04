@@ -31,6 +31,12 @@ import {
   PRICE_PERIODS,
   PROPERTY_TYPES,
 } from "@/lib/constants";
+import {
+  compressImage,
+  formatBytes,
+  LISTING_PHOTO,
+  MAX_ORIGINAL_BYTES,
+} from "@/lib/compress-image";
 import { stripPhoneNumbers } from "@/lib/format";
 
 const emptyToNull = (v: unknown) => (v === "" || v == null ? null : Number(v));
@@ -63,7 +69,6 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 const MAX_IMAGES = 10;
-const MAX_BYTES = 5 * 1024 * 1024;
 
 export type ExistingListing = Partial<Values> &
   Record<string, unknown> & {
@@ -85,6 +90,7 @@ export function ListingForm({
   const qc = useQueryClient();
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
   const [kept, setKept] = useState<string[]>(() =>
     [...(existing?.images ?? [])]
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -152,7 +158,7 @@ export function ListingForm({
     if (!selected) return;
     const all = Array.from(selected);
     const ok = all.filter(
-      (f) => /^image\/(png|jpeg|jpg|webp)$/.test(f.type) && f.size <= MAX_BYTES,
+      (f) => /^image\/(png|jpeg|jpg|webp)$/.test(f.type) && f.size <= MAX_ORIGINAL_BYTES,
     );
     if (ok.length < all.length) toast.error(t("form.photoRejected"));
     setFiles((prev) => [...prev, ...ok].slice(0, MAX_IMAGES - kept.length));
@@ -174,14 +180,25 @@ export function ListingForm({
     setBusy(true);
     try {
       const uploaded: string[] = [];
-      for (const f of files) {
-        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name.replace(/[^\w.-]/g, "_")}`;
+      let before = 0;
+      let after = 0;
+      for (const [i, original] of files.entries()) {
+        setProgress(t("form.compressing", { current: i + 1, total: files.length }));
+        const f = await compressImage(original, LISTING_PHOTO);
+        before += original.size;
+        after += f.size;
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name}`;
         const { error } = await supabase.storage
           .from("listing-images")
           .upload(path, f, { contentType: f.type, upsert: false });
         if (error) throw error;
         uploaded.push(supabase.storage.from("listing-images").getPublicUrl(path).data.publicUrl);
       }
+      setProgress(null);
+      if (files.length > 0)
+        toast.success(
+          t("form.compressed", { before: formatBytes(before), after: formatBytes(after) }),
+        );
       const gallery = [...kept, ...uploaded];
       const payload = {
         vendor_id: user.id,
@@ -241,6 +258,7 @@ export function ListingForm({
       const message = (e as Error).message;
       toast.error(message.includes("limit") ? t("form.limitReached") : message);
     } finally {
+      setProgress(null);
       setBusy(false);
     }
   };
@@ -494,7 +512,11 @@ export function ListingForm({
 
       {mode === "edit" && <p className="text-sm text-muted-foreground">{t("form.reviewNote")}</p>}
       <Button type="submit" className="w-full" size="lg" disabled={busy}>
-        {busy ? t("form.saving") : mode === "edit" ? t("form.saveChanges") : t("form.publish")}
+        {busy
+          ? (progress ?? t("form.saving"))
+          : mode === "edit"
+            ? t("form.saveChanges")
+            : t("form.publish")}
       </Button>
     </form>
   );

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { compressImage, MAX_ORIGINAL_BYTES, PROFILE_PHOTO } from "@/lib/compress-image";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { DISTRICTS } from "@/lib/constants";
@@ -110,20 +111,20 @@ function ProfilePage() {
   });
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    const original = e.target.files?.[0];
+    if (!original || !user) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(original.type)) {
       toast.error("Only JPG, PNG or WebP images are allowed");
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
-      toast.error("Image must be smaller than 3MB");
+    if (original.size > MAX_ORIGINAL_BYTES) {
+      toast.error("Image must be smaller than 25MB");
       return;
     }
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const file = await compressImage(original, PROFILE_PHOTO);
+      const path = `${user.id}/avatar-${Date.now()}.${file.type === "image/webp" ? "webp" : "jpg"}`;
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(path, file, { upsert: true, contentType: file.type });

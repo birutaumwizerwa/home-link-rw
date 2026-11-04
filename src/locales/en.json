@@ -340,7 +340,7 @@
     "seePlans": "See plans"
   },
   "form": {
-    "photoRejected": "Some photos were skipped. Use JPG, PNG or WebP under 5 MB.",
+    "photoRejected": "Some photos were skipped. Use JPG, PNG or WebP under 25 MB.",
     "saved": "Changes saved",
     "submitted": "Listing sent for review. It will appear once approved.",
     "limitReached": "You have reached your plan's listing limit.",
@@ -368,8 +368,8 @@
     "cell": "Cell or neighbourhood",
     "descriptionHint": "Describe the home and the area. Phone numbers are removed automatically.",
     "photos": "Photos",
-    "photoHint_one": "Upload up to {{count}} photo. JPG, PNG or WebP under 5 MB.",
-    "photoHint_other": "Upload up to {{count}} photos. JPG, PNG or WebP under 5 MB each.",
+    "photoHint_one": "Upload up to {{count}} photo. We compress it for you.",
+    "photoHint_other": "Upload up to {{count}} photos, JPG, PNG or WebP. We compress them for you.",
     "cover": "Cover",
     "removePhoto": "Remove photo",
     "videoTour": "Video tour",
@@ -380,7 +380,9 @@
     "saving": "Saving",
     "saveChanges": "Save changes",
     "publish": "Send for review",
-    "editTitle": "Edit listing"
+    "editTitle": "Edit listing",
+    "compressing": "Preparing photo {{current}} of {{total}}",
+    "compressed": "Photos reduced from {{before}} to {{after}}"
   },
   "dash": {
     "businessName": "Business or agency name",
@@ -551,7 +553,7 @@
     "saving": "Saving...",
     "saved": "Profile updated successfully",
     "avatarTitle": "Profile photo",
-    "avatarHint": "JPG, PNG or WebP · Max 3MB",
+    "avatarHint": "JPG, PNG or WebP. We compress it for you.",
     "removePhoto": "Remove photo",
     "changePhoto": "Change photo",
     "passwordTitle": "Password",

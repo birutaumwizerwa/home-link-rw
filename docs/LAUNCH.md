@@ -1,10 +1,11 @@
 # HomeLink Rwanda launch checklist
 
 ## 1. Update the database
-Run these two files in order before deploying the new code, because the app depends on them:
+Run these files in order before deploying the new code, because the app depends on them:
 
 1. `supabase/migrations/20261102120000_market_ready.sql` (skip it if you have already run it)
 2. `supabase/migrations/20261104120000_dashboards.sql`
+3. `supabase/migrations/20261104130000_image_limits.sql`
 
 Back up the database first (Supabase dashboard > Database > Backups), then either run `supabase db push`
 or paste the file into the Supabase SQL editor.
